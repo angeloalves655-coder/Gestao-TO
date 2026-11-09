@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GestãoTO Pro - Prontuário & Relatórios de Terapia Ocupacional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white; color: black; font-size: 12pt; }
+      .card-print { border: none !important; shadow: none !important; padding: 0 !important; box-shadow: none !important; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+  <!-- Header / Navbar -->
+  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-teal-500 text-slate-950 p-2 rounded-xl font-bold text-xl">
+          <i class="fa-solid fa-hands-holding-child"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-teal-400 leading-tight">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">PRO</span></h1>
+          <p class="text-xs text-slate-400">Prontuário & Gerador de Relatórios para T.O.</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex bg-slate-900/60 p-1 rounded-xl border border-slate-700">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 text-sm font-medium rounded-lg transition-all text-teal-400 bg-slate-800 shadow">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i> Painel
+        </button>
+        <button onclick="switchTab('pacientes')" id="tab-pacientes" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-user-group mr-1.5"></i> Pacientes
+        </button>
+        <button onclick="switchTab('evolucoes')" id="tab-evolucoes" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-notes-medical mr-1.5"></i> Evolução Diária
+        </button>
+        <button onclick="switchTab('relatorios')" id="tab-relatorios" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-file-signature mr-1.5"></i> Gerar Relatório
+        </button>
+        <button onclick="switchTab('config')" id="tab-config" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-gear mr-1.5"></i> Configurações
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- SEÇÃO: DASHBOARD -->
+    <section id="sec-dashboard" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+          <div class="flex justify-between items-start text-slate-400">
+            <span class="text-sm font-medium">Total de Pacientes</span>
+            <i class="fa-solid fa-users text-teal-400 text-lg"></i>
+          </div>
+          <div class="text-3xl font-bold text-slate-100 mt-2" id="dash-total-pacientes">0</div>
+          <span class="text-xs text-teal-400 font-medium">Cadastrados no sistema</span>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+          <div class="flex justify-between items-start text-slate-400">
+            <span class="text-sm font-medium">Atendimentos no Mês</span>
+            <i class="fa-solid fa-calendar-check text-blue-400 text-lg"></i>
+          </div>
+          <div class="text-3xl font-bold text-slate-100 mt-2" id="dash-atendimentos-mes">0</div>
+          <span class="text-xs text-slate-400">Registros no período</span>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+          <div class="flex justify-between items-start text-slate-400">
+            <span class="text-sm font-medium">Relatórios Gerados</span>
+            <i class="fa-solid fa-clock text-amber-400 text-lg"></i>
+          </div>
+          <div class="text-3xl font-bold text-amber-400 mt-2" id="dash-pendentes">0</div>
+          <span class="text-xs text-slate-400">Prontos para exportar</span>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+          <div class="flex justify-between items-start text-slate-400">
+            <span class="text-sm font-medium">Status do Sistema</span>
+            <i class="fa-solid fa-shield-halved text-emerald-400 text-lg"></i>
+          </div>
+          <div class="text-lg font-bold text-emerald-400 mt-2">Dados Salvos Localmente</div>
+          <span class="text-xs text-slate-400">Segurança & Privacidade OK</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-teal-400"></i> Ações Rápidas
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button onclick="switchTab('evolucoes')" class="p-4 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-xl text-left transition">
+            <i class="fa-solid fa-plus-circle text-teal-400 text-xl mb-2"></i>
+            <div class="font-semibold text-teal-300">Lançar Evolução Diária</div>
+            <div class="text-xs text-slate-400">Registrar atendimento de hoje</div>
+          </button>
+          <button onclick="switchTab('relatorios')" class="p-4 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl text-left transition">
+            <i class="fa-solid fa-file-export text-blue-400 text-xl mb-2"></i>
+            <div class="font-semibold text-blue-300">Gerar Relatórios</div>
+            <div class="text-xs text-slate-400">Evolução, Médico ou Convênio</div>
+          </button>
+          <button onclick="switchTab('pacientes')" class="p-4 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-xl text-left transition">
+            <i class="fa-solid fa-user-plus text-purple-400 text-xl mb-2"></i>
+            <div class="font-semibold text-purple-300">Novo Paciente</div>
+            <div class="text-xs text-slate-400">Cadastrar paciente e diagnóstico</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: PACIENTES -->
+    <section id="sec-pacientes" class="hidden space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-slate-100">Cadastro & Gestão de Pacientes</h2>
+        <button onclick="toggleModalPaciente(true)" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold rounded-xl transition flex items-center gap-2">
+          <i class="fa-solid fa-user-plus"></i> Novo Paciente
+        </button>
+      </div>
+
+      <!-- Tabela de Pacientes -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900/60 text-slate-400 uppercase text-xs font-semibold">
+            <tr>
+              <th class="p-4">Paciente / Responsável</th>
+              <th class="p-4">Diagnóstico / CID</th>
+              <th class="p-4">Convênio</th>
+              <th class="p-4 text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="lista-pacientes-body" class="divide-y divide-slate-700/50">
+            <!-- Renderizado via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MODAL NOVO PACIENTE -->
+    <div id="modal-paciente" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+          <h3 class="text-lg font-bold text-slate-100">Cadastrar Novo Paciente</h3>
+          <button onclick="toggleModalPaciente(false)" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="form-paciente" onsubmit="salvarPaciente(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Nome Completo do Paciente *</label>
+            <input type="text" id="pac-nome" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 outline-none focus:border-teal-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Data Nasc.</label>
+              <input type="date" id="pac-dn" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 outline-none focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Responsável</label>
+              <input type="text" id="pac-resp" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 outline-none focus:border-teal-500">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Convênio</label>
+              <input type="text" id="pac-conv" placeholder="Ex: Unimed, Particular" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 outline-none focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">CID-10 / Diagnóstico</label>
+              <input type="text" id="pac-cid" placeholder="Ex: F84.0 - TEA" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 outline-none focus:border-teal-500">
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-3">
+            <button type="button" onclick="toggleModalPaciente(false)" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-sm">Cancelar</button>
+            <button type="submit" class="px-5 py-2 bg-teal-500 text-slate-950 font-bold rounded-xl text-sm hover:bg-teal-400">Salvar Paciente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SEÇÃO: EVOLUÇÃO DIÁRIA -->
+    <section id="sec-evolucoes" class="hidden space-y-6">
+      <h2 class="text-xl font-bold text-slate-100">Registro de Evolução Diária</h2>
+      
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <form id="form-evolucao" onsubmit="salvarEvolucao(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Selecione o Paciente *</label>
+              <select id="evo-paciente" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none">
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Data do Atendimento *</label>
+              <input type="date" id="evo-data" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Status da Sessão</label>
+              <select id="evo-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none">
+                <option value="Atendido">Atendido</option>
+                <option value="Falta Justificada">Falta Justificada</option>
+                <option value="Falta Sem Justificativa">Falta Sem Justificativa</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-2">Áreas de Foco Trabalhadas na Sessão</label>
+            <div class="flex flex-wrap gap-2" id="foco-tags">
+              <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-300 has-[:checked]:bg-teal-500/20 has-[:checked]:border-teal-500 has-[:checked]:text-teal-300">
+                <input type="checkbox" value="Integração Sensorial" class="hidden"> Integração Sensorial
+              </label>
+              <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-300 has-[:checked]:bg-teal-500/20 has-[:checked]:border-teal-500 has-[:checked]:text-teal-300">
+                <input type="checkbox" value="Coordenação Motora Fina" class="hidden"> Motricidade Fina
+              </label>
+              <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-300 has-[:checked]:bg-teal-500/20 has-[:checked]:border-teal-500 has-[:checked]:text-teal-300">
+                <input type="checkbox" value="AVDs & Autonomia" class="hidden"> AVDs & Autonomia
+              </label>
+              <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-300 has-[:checked]:bg-teal-500/20 has-[:checked]:border-teal-500 has-[:checked]:text-teal-300">
+                <input type="checkbox" value="Regulação Emocional" class="hidden"> Regulação Emocional
+              </label>
+              <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-300 has-[:checked]:bg-teal-500/20 has-[:checked]:border-teal-500 has-[:checked]:text-teal-300">
+                <input type="checkbox" value="Planejamento Motor" class="hidden"> Planejamento Motor
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Descrição do Atendimento & Resposta do Paciente *</label>
+            <textarea id="evo-texto" rows="4" required placeholder="Ex: Trabalhado circuito proprioceptivo. Paciente apresentou melhor engajamento e manteve atenção por 15 min na atividade de grafomotricidade..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none"></textarea>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold rounded-xl transition flex items-center gap-2">
+              <i class="fa-solid fa-save"></i> Salvar Evolução
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: GERADOR DE RELATÓRIOS -->
+    <section id="sec-relatorios" class="hidden space-y-6">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 no-print">
+        <h2 class="text-xl font-bold text-slate-100 mb-4">Gerador Automático de Relatório</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Paciente</label>
+            <select id="rel-paciente" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none">
+              <option value="">Selecione o paciente...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Tipo de Relatório</label>
+            <select id="rel-tipo" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none">
+              <option value="evolucao">Relatório de Evolução (Para Família/Escola)</option>
+              <option value="medico">Relatório para Médico</option>
+              <option value="convenio">Solicitação de Guia / Convênio</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="gerarRelatorio()" class="w-full py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold rounded-xl transition flex justify-center items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview do Relatório -->
+      <div id="relatorio-out" class="hidden bg-white text-slate-900 p-8 rounded-2xl shadow-xl max-w-4xl mx-auto space-y-6 card-print">
+        <div class="flex justify-between items-center border-b pb-4 border-slate-300">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-800" id="print-clinica">GestãoTO - Terapia Ocupacional Pediatric</h1>
+            <p class="text-xs text-slate-500" id="print-prof-info">Terapeuta Ocupacional | CREFITO: 00000-TO</p>
+          </div>
+          <div class="text-right text-xs text-slate-500">
+            <p id="print-data-emissao"></p>
+          </div>
+        </div>
+
+        <div id="relatorio-conteudo" class="space-y-4 text-sm leading-relaxed">
+          <!-- Conteúdo Gerado -->
+        </div>
+
+        <div class="pt-12 text-center border-t border-slate-300 mt-8">
+          <div class="w-64 border-b border-slate-400 mx-auto mb-2"></div>
+          <p class="font-bold text-slate-800" id="print-ass-nome">Angelo José Alves</p>
+          <p class="text-xs text-slate-500" id="print-ass-crefito">Terapeuta Ocupacional - CREFITO</p>
+        </div>
+
+        <!-- Botões de Ação do Relatório -->
+        <div class="flex justify-end gap-3 no-print pt-4 border-t">
+          <button onclick="copiarRelatorio()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-xl text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> Copiar Texto
+          </button>
+          <button onclick="window.print()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-xl text-xs transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: CONFIGURAÇÕES -->
+    <section id="sec-config" class="hidden space-y-6 max-w-2xl mx-auto">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4">
+        <h2 class="text-xl font-bold text-slate-100 mb-4">Dados do Profissional</h2>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Seu Nome Completo</label>
+          <input type="text" id="cfg-nome" value="Angelo José Alves" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Registro Profissional (CREFITO)</label>
+          <input type="text" id="cfg-crefito" value="CREFITO-SP / 12345" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Nome do Consultório / Clínica</label>
+          <input type="text" id="cfg-clinica" value="Consultório de Terapia Ocupacional & Integração Sensorial" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 outline-none">
+        </div>
+        <button onclick="salvarConfig()" class="w-full py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition">
+          Salvar Configurações
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ESTADO DA APLICAÇÃO
+    let dados = JSON.parse(localStorage.getItem('gestaoTO_data')) || {
+      config: { nome: 'Angelo José Alves', crefito: 'CREFITO-SP / 12345', clinica: 'Consultório de T.O. Pediatria' },
+      pacientes: [
+        { id: 1, nome: 'Lucas Silva', dn: '2018-05-12', resp: 'Maria Silva', conv: 'Unimed', cid: 'F84.0 - Transtorno do Espectro Autista' }
+      ],
+      evolucoes: [
+        { id: 1, pacienteId: 1, data: '2026-12-01', status: 'Atendido', focos: ['Integração Sensorial', 'AVDs'], texto: 'Paciente engajou bem no balanço terapêutico e realizou treino de vestuário.' }
+      ]
+    };
+
+    function init() {
+      renderPacientes();
+      updateSelects();
+      updateDashboard();
+      document.getElementById('evo-data').valueAsDate = new Date();
+    }
+
+    function switchTab(tab) {
+      ['dashboard', 'pacientes', 'evolucoes', 'relatorios', 'config'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove('text-teal-400', 'bg-slate-800', 'shadow');
+        document.getElementById(`tab-${t}`).classList.add('text-slate-400');
+      });
+      document.getElementById(`sec-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).classList.add('text-teal-400', 'bg-slate-800', 'shadow');
+    }
+
+    function toggleModalPaciente(show) {
+      const m = document.getElementById('modal-paciente');
+      if(show) m.classList.remove('hidden');
+      else m.classList.add('hidden');
+    }
+
+    function salvarPaciente(e) {
+      e.preventDefault();
+      const novo = {
+        id: Date.now(),
+        nome: document.getElementById('pac-nome').value,
+        dn: document.getElementById('pac-dn').value,
+        resp: document.getElementById('pac-resp').value,
+        conv: document.getElementById('pac-conv').value,
+        cid: document.getElementById('pac-cid').value
+      };
+      dados.pacientes.push(novo);
+      localStorage.setItem('gestaoTO_data', JSON.stringify(dados));
+      renderPacientes();
+      updateSelects();
+      updateDashboard();
+      toggleModalPaciente(false);
+      document.getElementById('form-paciente').reset();
+    }
+
+    function deletarPaciente(id) {
+      if(confirm('Deseja excluir este paciente?')) {
+        dados.pacientes = dados.pacientes.filter(p => p.id !== id);
+        localStorage.setItem('gestaoTO_data', JSON.stringify(dados));
+        renderPacientes();
+        updateSelects();
+        updateDashboard();
+      }
+    }
+
+    function renderPacientes() {
+      const tbody = document.getElementById('lista-pacientes-body');
+      tbody.innerHTML = dados.pacientes.map(p => `
+        <tr>
+          <td class="p-4 font-medium text-slate-100">${p.nome}<br><span class="text-xs text-slate-400">Resp: ${p.resp}</span></td>
+          <td class="p-4 text-xs">${p.cid}</td>
+          <td class="p-4 text-xs">${p.conv}</td>
+          <td class="p-4 text-center">
+            <button onclick="deletarPaciente(${p.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i> Excluir</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateSelects() {
+      const opts = '<option value="">Selecione...</option>' + dados.pacientes.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+      document.getElementById('evo-paciente').innerHTML = opts;
+      document.getElementById('rel-paciente').innerHTML = opts;
+    }
+
+    function salvarEvolucao(e) {
+      e.preventDefault();
+      const pId = parseInt(document.getElementById('evo-paciente').value);
+      const data = document.getElementById('evo-data').value;
+      const status = document.getElementById('evo-status').value;
+      const texto = document.getElementById('evo-texto').value;
+      
+      const focos = Array.from(document.querySelectorAll('#foco-tags input:checked')).map(cb => cb.value);
+
+      dados.evolucoes.push({ id: Date.now(), pacienteId: pId, data, status, focos, texto });
+      localStorage.setItem('gestaoTO_data', JSON.stringify(dados));
+      
+      alert('Evolução registrada com sucesso!');
+      document.getElementById('form-evolucao').reset();
+      updateDashboard();
+    }
+
+    function gerarRelatorio() {
+      const pId = parseInt(document.getElementById('rel-paciente').value);
+      const tipo = document.getElementById('rel-tipo').value;
+      const paciente = dados.pacientes.find(p => p.id === pId);
+      
+      if(!paciente) return alert('Selecione um paciente');
+
+      const evolucoes = dados.evolucoes.filter(e => e.pacienteId === pId);
+      const out = document.getElementById('relatorio-conteudo');
+      
+      document.getElementById('print-clinica').innerText = dados.config.clinica;
+      document.getElementById('print-prof-info').innerText = `${dados.config.nome} | ${dados.config.crefito}`;
+      document.getElementById('print-ass-nome').innerText = dados.config.nome;
+      document.getElementById('print-ass-crefito').innerText = dados.config.crefito;
+      document.getElementById('print-data-emissao').innerText = `Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
+
+      let bodyHTML = `
+        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-4">
+          <p><strong>Paciente:</strong> ${paciente.nome} | <strong>CID:</strong> ${paciente.cid}</p>
+          <p><strong>Responsável:</strong> ${paciente.resp} | <strong>Convênio:</strong> ${paciente.conv}</p>
+        </div>
+      `;
+
+      if(tipo === 'evolucao') {
+        bodyHTML += `<h2 class="text-lg font-bold underline mb-2">RELATÓRIO DE EVOLUÇÃO TERAPÊUTICA</h2>`;
+        if(evolucoes.length === 0) {
+          bodyHTML += `<p class="italic text-slate-500">Nenhuma evolução registrada para este paciente ainda.</p>`;
+        } else {
+          bodyHTML += evolucoes.map(e => `
+            <div class="mb-3 border-b border-slate-200 pb-2">
+              <p class="font-semibold text-xs text-teal-800">Sessão em ${e.data} - Status: ${e.status}</p>
+              <p class="text-xs text-slate-600">Focos: ${e.focos.join(', ')}</p>
+              <p class="mt-1">${e.texto}</p>
+            </div>
+          `).join('');
+        }
+      } else if(tipo === 'medico') {
+        bodyHTML += `<h2 class="text-lg font-bold underline mb-2">PARECER TÉCNICO INTERDISCIPLINAR (PARA MÉDICO)</h2>
+        <p>Acompanhamento de Terapia Ocupacional realizado no período. O paciente demonstra avanços significativos nas áreas de regulação sensório-motora e planejamento executivo.</p>
+        <p class="mt-2"><strong>Conduta:</strong> Recomendada a continuidade das intervenções de Terapia Ocupacional com foco em Integração Sensorial e Autonomia.</p>`;
+      } else {
+        bodyHTML += `<h2 class="text-lg font-bold underline mb-2">SOLICITAÇÃO DE GUIA E CONTINUIDADE TERAPÊUTICA</h2>
+        <p>Solicito prorrogação de tratamento de Terapia Ocupacional para o paciente <strong>${paciente.nome}</strong> (CID: ${paciente.cid}).</p>
+        <p class="mt-2">O plano terapêutico prevê sessões semanais com duração de 50 minutos para manutenção das conquistas de autonomia e regulação sensório-motora.</p>`;
+      }
+
+      out.innerHTML = bodyHTML;
+      document.getElementById('relatorio-out').classList.remove('hidden');
+    }
+
+    function copiarRelatorio() {
+      const texto = document.getElementById('relatorio-conteudo').innerText;
+      navigator.clipboard.writeText(texto).then(() => alert('Texto do relatório copiado!'));
+    }
+
+    function updateDashboard() {
+      document.getElementById('dash-total-pacientes').innerText = dados.pacientes.length;
+      document.getElementById('dash-atendimentos-mes').innerText = dados.evolucoes.length;
+      document.getElementById('dash-pendentes').innerText = dados.evolucoes.length;
+    }
+
+    function salvarConfig() {
+      dados.config.nome = document.getElementById('cfg-nome').value;
+      dados.config.crefito = document.getElementById('cfg-crefito').value;
+      dados.config.clinica = document.getElementById('cfg-clinica').value;
+      localStorage.setItem('gestaoTO_data', JSON.stringify(dados));
+      alert('Configurações salvas!');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
