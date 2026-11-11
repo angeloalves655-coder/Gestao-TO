@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GestãoTO Express - Gerador de Relatório Rápido</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; font-size: 11pt; }
+      .card-print { 
+        border: none !important; 
+        box-shadow: none !important; 
+        padding: 0 !important; 
+        max-width: 100% !important; 
+        margin: 0 !important;
+      }
+      textarea {
+        border: none !important;
+        resize: none !important;
+        outline: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+  <!-- Topo Simples -->
+  <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 no-print">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-teal-500 text-slate-950 p-2 rounded-xl font-bold text-lg">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">Express</span></h1>
+          <p class="text-xs text-slate-400">Gerador Rápido de Relatórios T.O.</p>
+        </div>
+      </div>
+      <button onclick="carregarListaFoco()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl transition">
+        <i class="fa-solid fa-rotate-left mr-1"></i> Resetar Lista (A-Z)
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- FORMULÁRIO DE ENTRADA RÁPIDA -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 no-print space-y-5 shadow-lg">
+      <h2 class="text-lg font-bold text-slate-100 border-b border-slate-700 pb-3 flex items-center gap-2">
+        <i class="fa-solid fa-user-check text-teal-400"></i> 1. Selecione o Paciente e Descreva a Sessão
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Paciente (Ordem Alfabética):</label>
+          <select id="paciente-select" onchange="atualizarInfoPaciente(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-sm">
+            <option value="">Selecione a criança...</option>
+          </select>
+        </div>
+
+        <div class="flex items-end gap-3 text-xs text-slate-400 bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
+          <div>Convênio: <span id="info-conv" class="text-teal-400 font-bold block text-sm">-</span></div>
+          <div>CID-10: <span id="info-cid" class="text-slate-200 font-bold block text-sm">-</span></div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+          O que aconteceu no atendimento? (Escreva de forma simples):
+        </label>
+        <textarea id="texto-simples" rows="4" placeholder="Ex: Brincou na piscina de bolinhas, fez circuito motor subindo a rampa e trabalhou com massinha fazendo bolinhas." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-slate-100 focus:border-teal-500 outline-none text-sm leading-relaxed"></textarea>
+      </div>
+
+      <button onclick="gerarRelatorioElaborado()" class="w-full py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-base">
+        <i class="fa-solid fa-file-signature"></i> Gerar Relatório Clínico Elaborado
+      </button>
+    </div>
+
+    <!-- PREVIEW DO RELATÓRIO PRONTO PARA EDITAR / IMPRIMIR -->
+    <div id="relatorio-out" class="hidden bg-white text-slate-900 p-8 md:p-12 rounded-2xl shadow-2xl space-y-6 card-print">
+      
+      <div class="text-center border-b pb-4 border-slate-300">
+        <h1 class="text-xl font-bold tracking-wide text-slate-900 uppercase">RELATÓRIO DE EVOLUÇÃO EM TERAPIA OCUPACIONAL</h1>
+        <p class="text-xs text-slate-600 mt-1" id="print-clinica">Consultório de Terapia Ocupacional Pedriátrica</p>
+      </div>
+
+      <div class="border-b pb-4 border-slate-300">
+        <h2 class="text-xs font-bold text-slate-900 border-b-2 border-slate-900 pb-0.5 mb-2 uppercase tracking-wide">Identificação do Paciente</h2>
+        <div class="grid grid-cols-2 gap-2 text-xs text-slate-800" id="print-identificacao"></div>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-bold text-slate-900 border-b-2 border-slate-900 pb-0.5 mb-1 uppercase tracking-wide">Procedimento & Recursos Terapêuticos</h2>
+        <textarea id="rel-procedimento" rows="3" class="w-full text-xs text-slate-800 leading-relaxed text-justify border-none focus:ring-1 focus:ring-teal-500 rounded p-1 resize-y outline-none"></textarea>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-bold text-slate-900 border-b-2 border-slate-900 pb-0.5 mb-1 uppercase tracking-wide">Análise Técnica & Objetivos Estimulados</h2>
+        <textarea id="rel-analise" rows="6" class="w-full text-xs text-slate-800 leading-relaxed text-justify border-none focus:ring-1 focus:ring-teal-500 rounded p-1 resize-y outline-none"></textarea>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-bold text-slate-900 border-b-2 border-slate-900 pb-0.5 mb-1 uppercase tracking-wide">Parecer & Conduta</h2>
+        <textarea id="rel-conduta" rows="3" class="w-full text-xs text-slate-800 leading-relaxed text-justify border-none focus:ring-1 focus:ring-teal-500 rounded p-1 resize-y outline-none"></textarea>
+      </div>
+
+      <div class="pt-10 text-center mt-6">
+        <div class="w-64 border-b border-slate-800 mx-auto mb-1"></div>
+        <p class="font-bold text-slate-900 text-xs" id="print-nome-to">Angelo José Alves</p>
+        <p class="text-[11px] text-slate-600">Terapeuta Ocupacional - CREFITO-SP / 12345</p>
+      </div>
+
+      <div class="flex justify-end gap-3 no-print pt-4 border-t border-slate-200">
+        <button onclick="window.print()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const pacientesFotos = [
+      { id: 102, nome: 'Bernardo Marinho Mota', conv: 'SAVI', cid: 'F84.0', dn: '' },
+      { id: 1021, nome: 'Bernardo Martins de Castro', conv: 'SAVI', cid: 'F84.0', dn: '2021-05-14' },
+      { id: 115, nome: 'Davi Lucas Mendes Romano', conv: 'SANTA TEREZA', cid: 'F84.0', dn: '' },
+      { id: 109, nome: 'Davi Milan Mattos', conv: 'SAVI', cid: 'F84.0', dn: '2020-08-10' },
+      { id: 104, nome: 'Fabricio Prado Brocanelli', conv: 'SAVI', cid: 'F84.0', dn: '2022-01-20' },
+      { id: 113, nome: 'Felipe Althman Tonussi', conv: 'SÃO LUCAS', cid: 'F84.0', dn: '2021-11-03' },
+      { id: 116, nome: 'Felipe Gomes Gianelli', conv: 'SÃO LUCAS', cid: 'F84.0', dn: '' },
+      { id: 117, nome: 'Gabriel Torraca Baião', conv: 'UNIMED', cid: 'F84.0', dn: '' },
+      { id: 111, nome: 'Isaque Valadão de Souza', conv: 'SANTA TEREZA', cid: 'F84.0', dn: '2020-03-25' },
+      { id: 105, nome: 'João Gabriel Barboza de Souza', conv: 'SAVI', cid: 'F84.0', dn: '2021-09-17' },
+      { id: 118, nome: 'João Miguel de Lima Olimpio', conv: 'SÃO LUCAS', cid: 'F84.0', dn: '' },
+      { id: 108, nome: 'João Pedro Scarparo Cintra', conv: 'SÃO LUCAS', cid: 'F84.0', dn: '2019-12-05' },
+      { id: 107, nome: 'Joshua Canellato', conv: 'UNIMED', cid: 'F84.0', dn: '2022-04-12' },
+      { id: 103, nome: 'Julia Pereira de Morais', conv: 'UNIMED', cid: 'F84.0', dn: '2021-07-30' },
+      { id: 106, nome: 'Luisa Ginetti Damasceno', conv: 'UNIMED', cid: 'F84.0', dn: '2020-10-18' },
+      { id: 110, nome: 'Maria Vitoria Pereira dos Santos', conv: 'SAVI', cid: 'F84.0', dn: '2021-02-14' },
+      { id: 119, nome: 'Marlos Ryan Fernandes', conv: 'SÃO LUCAS', cid: 'F84.0', dn: '' },
+      { id: 114, nome: 'Matheus Mestre de Moura', conv: 'SAVI', cid: 'F84.0', dn: '2022-06-08' },
+      { id: 120, nome: 'Matheus Teixeira Martins', conv: 'SAVI', cid: 'F84.0', dn: '' },
+      { id: 112, nome: 'Miguel Milan Mattos', conv: 'SAVI', cid: 'F84.0', dn: '2020-08-10' },
+      { id: 121, nome: 'Nicolas Lahr Rocha', conv: 'UNIMED', cid: 'F84.0', dn: '' },
+      { id: 101, nome: 'Noah de Freitas Silva', conv: 'SAVI', cid: 'F84.0', dn: '2021-12-11' },
+      { id: 122, nome: 'Pedro Braga Bersani', conv: 'SUL AMÉRICA', cid: 'F84.0', dn: '' },
+      { id: 123, nome: 'Yuri Azuma', conv: 'SAVI', cid: 'F84.0', dn: '' }
+    ];
+
+    // DICIONÁRIO AUTOMÁTICO DE ATIVIDADES -> TRADUÇÃO EM TERMOS TÉCNICOS DE T.O.
+    const dicionarioTO = [
+      {
+        palavras: ['piscina de bolinhas', 'bolinha', 'bolinhas'],
+        procedimento: 'propostas de imersão sensorial em piscina de bolinhas',
+        estimulo: 'estímulo proprioceptivo e tátil profundo, modulação sensorial, registro tátil e autorregulação do nível de alerta'
+      },
+      {
+        palavras: ['circuito', 'rampa', 'túnel', 'ponte', 'obstáculo', 'obstaculos'],
+        procedimento: 'percurso motor estruturado (circuito psicomotor com rampas e transição de níveis)',
+        estimulo: 'planejamento motor (praxia global), controle postural, equilíbrio dinâmico e organização do esquema corporal'
+      },
+      {
+        palavras: ['massinha', 'argila', 'amoeba', 'slime', 'textura'],
+        procedimento: 'atividades de manipulação de materiais de alta resistência e estimulação tátil (massinha de modelar)',
+        estimulo: 'fortalecimento de musculatura intrínseca das mãos, modulação da sensibilidade tátil e coordenação motora fina'
+      },
+      {
+        palavras: ['balanço', 'balanco', 'rede', 'trapézio', 'trapezio', 'suspensão'],
+        procedimento: 'experiências em equipamentos suspensos de Integração Sensorial (balanço)',
+        estimulo: 'estimulação vestibular (linear/rotacional), ajuste postural reflexo e organização da estabilidade central (core)'
+      },
+      {
+        palavras: ['tesoura', 'recorte', 'papel', 'cortar'],
+        procedimento: 'atividades de manuseio de instrumento de corte (tesoura e papel)',
+        estimulo: 'coordenação bimanual, dissociação de cintura escapular/digital e integração visomotora'
+      },
+      {
+        palavras: ['pinça', 'pinca', 'lápis', 'lapis', 'desenho', 'pintura', 'grafismo'],
+        procedimento: 'atividades gráficas e de manipulação de ferramentas manuais',
+        estimulo: 'aprimoramento da preensão digital (ajuste de pinça trípode), controle de força muscular (graduação de força) e grafomotricidade'
+      },
+      {
+        palavras: ['jogo', 'regra', 'quebra-cabeça', 'quebra cabeça', 'memória', 'encaixe'],
+        procedimento: 'jogos estruturados e tarefas de solução de problemas manuais',
+        estimulo: 'funções executivas (atenção sustentada, flexibilidade cognitiva), planejamento práxico e engajamento ocupacional'
+      },
+      {
+        palavras: ['comida', 'alimentação', 'seletividade', 'talher', 'copo'],
+        procedimento: 'treino e dessensibilização oral/tátil voltados às Atividades de Vida Diária (AVDs)',
+        estimulo: 'autonomia em AVDs, aceitação de novas texturas e refinamento do controle motor oral e bimanual'
+      }
+    ];
+
+    function init() {
+      const select = document.getElementById('paciente-select');
+      pacientesFotos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+      select.innerHTML = '<option value="">Selecione a criança...</option>' + 
+        pacientesFotos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    }
+
+    function carregarListaFoco() {
+      init();
+      alert('Lista de pacientes atualizada em ordem A-Z!');
+    }
+
+    function atualizarInfoPaciente(val) {
+      if(!val) {
+        document.getElementById('info-conv').innerText = '-';
+        document.getElementById('info-cid').innerText = '-';
+        return;
+      }
+      const p = pacientesFotos.find(x => x.id === parseInt(val));
+      if(p) {
+        document.getElementById('info-conv').innerText = p.conv || 'SAVI';
+        document.getElementById('info-cid').innerText = p.cid || 'F84.0';
+      }
+    }
+
+    function gerarRelatorioElaborado() {
+      const pId = parseInt(document.getElementById('paciente-select').value);
+      const textoSimples = document.getElementById('texto-simples').value.trim();
+
+      if(!pId) return alert('Por favor, selecione um paciente!');
+      if(!textoSimples) return alert('Escreva o que a criança fez na sessão!');
+
+      const p = pacientesFotos.find(x => x.id === pId);
+      const primeiroNome = p.nome.split(' ')[0];
+      const dnFormatada = p.dn ? new Date(p.dn + 'T00:00:00').toLocaleDateString('pt-BR') : 'Não informada';
+
+      // ANALISAR O TEXTO E EXTRAIR TERMOS TÉCNICOS AUTOMATICAMENTE
+      const textoLower = textoSimples.toLowerCase();
+      let procedimentosEncontrados = [];
+      let estimulosEncontrados = [];
+
+      dicionarioTO.forEach(item => {
+        const achou = item.palavras.some(palavra => textoLower.includes(palavra));
+        if(achou) {
+          procedimentosEncontrados.push(item.procedimento);
+          estimulosEncontrados.push(item.estimulo);
+        }
+      });
+
+      // Se não encontrou palavra-chave específica, aplica uma síntese técnica geral
+      let procedimentoFinal = procedimentosEncontrados.length > 0
+        ? `No atendimento realizado, utilizaram-se como recursos terapêuticos: ${procedimentosEncontrados.join('; ')}.`
+        : `Realizou-se atendimento terapêutico ocupacional baseado em estratégias lúdicas direcionadas, contemplando a proposta relatada: "${textoSimples}".`;
+
+      let estimulosFinal = estimulosEncontrados.length > 0
+        ? `As atividades propostas promoveram o estímulo e desenvolvimento de: ${estimulosEncontrados.join('; ')}.`
+        : `As intervenções visaram favorecer o engajamento ocupacional, a organização corporal, a regulação comportamental e a resposta adaptativa frente aos desafios oferecidos.`;
+
+      // MONTAR O RELATÓRIO TÉCNICO COMPLETO
+      document.getElementById('print-identificacao').innerHTML = `
+        <p><strong>Nome do Paciente:</strong> ${p.nome}</p>
+        <p><strong>Data de Nascimento:</strong> ${dnFormatada}</p>
+        <p><strong>Convênio:</strong> ${p.conv || 'SAVI'}</p>
+        <p><strong>CID-10:</strong> ${p.cid || 'F84.0'}</p>
+      `;
+
+      document.getElementById('rel-procedimento').value = 
+        `Durante a sessão de Terapia Ocupacional, a criança participou de intervenções terapêuticas estruturadas. ${procedimentoFinal}`;
+
+      document.getElementById('rel-analise').value = 
+        `Sob a análise do Desempenho Ocupacional e da Integração Sensorial, observa-se que ${primeiroNome} demonstrou prontidão e engajamento nas tarefas. ${estimulosFinal}\n\nA criança manteve boa resposta adaptativa, demonstrando evolução na autorregulação e na capacidade de organização do comportamento no ambiente terapêutico.`;
+
+      document.getElementById('rel-conduta').value = 
+        `Recomenda-se a continuidade do acompanhamento em Terapia Ocupacional para manutenção dos ganhos sensório-motores e fortalecimento da autonomia funcional.`;
+
+      document.getElementById('relatorio-out').classList.remove('hidden');
+      document.getElementById('relatorio-out').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
