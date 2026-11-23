@@ -80,8 +80,8 @@
         <button onclick="exportarBackup()" title="Baixar cópia de segurança de todos os pacientes e evoluções" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-download mr-1"></i> Backup
         </button>
-        <label title="Restaurar arquivo de backup" class="cursor-pointer px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center">
-          <i class="fa-solid fa-upload mr-1"></i> Restaurar
+        <label title="Restaurar arquivo de backup (.json) ou importar pacientes de outra versão" class="cursor-pointer px-3 py-2 bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/30 text-xs font-semibold rounded-xl transition flex items-center">
+          <i class="fa-solid fa-upload mr-1"></i> Importar / Restaurar
           <input type="file" accept=".json" onchange="importarBackup(event)" class="hidden">
         </label>
       </div>
@@ -90,15 +90,31 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
+    <!-- Aviso de Sincronização de Pacientes -->
+    <div id="banner-recuperacao" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 no-print flex flex-wrap items-center justify-between gap-3 text-xs text-amber-200">
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-circle-info text-amber-400 text-base"></i>
+        <span>Se você abriu o arquivo em uma pasta diferente no computador, o navegador cria um armazenamento separado. Clique em <strong>Importar / Restaurar</strong> acima para carregar seu arquivo <code>Backup_GestaoTO.json</code> ou cole os nomes em lote abaixo.</span>
+      </div>
+      <button onclick="abrirModalImportarLote()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition whitespace-nowrap">
+        + Colar Lista de Pacientes
+      </button>
+    </div>
+
     <!-- PAINEL DE ENTRADA RÁPIDA -->
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 no-print space-y-5 shadow-lg">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
         <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square text-teal-400"></i> Registro Rápido de Sessão / Período
         </h2>
-        <span class="text-[11px] text-emerald-400 flex items-center gap-1">
-          <i class="fa-solid fa-cloud-check"></i> Salvamento Automático Ativo
-        </span>
+        <div class="flex items-center gap-3">
+          <button onclick="abrirModalImportarLote()" class="text-[11px] text-teal-300 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-users"></i> Importar vários nomes
+          </button>
+          <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+            <i class="fa-solid fa-cloud-check"></i> Salvamento Automático
+          </span>
+        </div>
       </div>
 
       <!-- Seleção de Paciente e Dados Rápidos -->
@@ -209,7 +225,7 @@
 
   </main>
 
-  <!-- Modal Adicionar Paciente -->
+  <!-- Modal Adicionar Paciente Individual -->
   <div id="modal-paciente" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md space-y-4">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -240,6 +256,22 @@
           <button type="submit" class="px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-xl text-xs">Salvar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Importar Vários Pacientes em Lote -->
+  <div id="modal-lote" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-base font-bold text-slate-100">Importar Lista de Pacientes (Um por linha)</h3>
+        <button onclick="fecharModalImportarLote()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-slate-300">Cole os nomes dos pacientes que você tinha cadastrado (um nome por linha). O sistema adiciona todos sem duplicar os que já existem:</p>
+      <textarea id="texto-lote-pacientes" rows="8" placeholder="Ex:&#10;Arthur Silva Santos&#10;Enzo Gabriel Oliveira&#10;Helena Costa Lima" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 text-sm outline-none focus:border-teal-500"></textarea>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="fecharModalImportarLote()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs">Cancelar</button>
+        <button type="button" onclick="processarImportacaoLote()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl text-xs">Adicionar Todos à Lista</button>
+      </div>
     </div>
   </div>
 
@@ -277,16 +309,64 @@
       { id: 123, nome: 'Yuri Azuma', conv: 'SAVI', cid: 'F84.0', dn: '' }
     ];
 
+    // VARREDURA COMPLETA EM TODAS AS CHAVES POSSÍVEIS DO LOCALSTORAGE
     function carregarEMesclarPacientes() {
       let salvosNoNavegador = [];
+      const chavesConhecidas = [
+        'gestaoTO_lista_pacientes',
+        'gestaoTO_pro_data',
+        'gestaoTO_pacientes',
+        'pacientes_to',
+        'pacientes'
+      ];
+
+      chavesConhecidas.forEach(chave => {
+        try {
+          const bruto = localStorage.getItem(chave);
+          if (!bruto) return;
+          const parsed = JSON.parse(bruto);
+          if (Array.isArray(parsed)) {
+            salvosNoNavegador.push(...parsed);
+          } else if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.pacientes)) salvosNoNavegador.push(...parsed.pacientes);
+            if (Array.isArray(parsed.listaPacientes)) salvosNoNavegador.push(...parsed.listaPacientes);
+          }
+        } catch (e) {}
+      });
+
+      // Também varre qualquer outra chave do localStorage que contenha objetos com "nome"
       try {
-        const raw1 = JSON.parse(localStorage.getItem('gestaoTO_lista_pacientes')) || [];
-        const raw2 = JSON.parse(localStorage.getItem('gestaoTO_pro_data'));
-        const arr2 = (raw2 && Array.isArray(raw2.pacientes)) ? raw2.pacientes : [];
-        salvosNoNavegador = [...raw1, ...arr2];
-      } catch (e) {
-        salvosNoNavegador = [];
-      }
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (chavesConhecidas.includes(k)) continue;
+          const val = localStorage.getItem(k);
+          if (val && val.includes('"nome"')) {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) {
+              salvosNoNavegador.push(...parsed.filter(item => item && item.nome && !item.textoCompleto));
+            } else if (parsed && Array.isArray(parsed.pacientes)) {
+              salvosNoNavegador.push(...parsed.pacientes);
+            }
+          }
+        }
+      } catch (e) {}
+
+      // Também extrai nomes de pacientes que já tenham evoluções salvas em gestaoTO_evolucoes_salvas
+      try {
+        const evs = JSON.parse(localStorage.getItem('gestaoTO_evolucoes_salvas')) || {};
+        Object.keys(evs).forEach(pId => {
+          const arr = evs[pId];
+          if (Array.isArray(arr) && arr.length > 0 && arr[0].pacienteNome) {
+            salvosNoNavegador.push({
+              id: parseInt(pId) || Date.now(),
+              nome: arr[0].pacienteNome,
+              conv: arr[0].convenio || 'PARTICULAR',
+              cid: arr[0].cid || 'F84.0',
+              dn: arr[0].dnFormatada || ''
+            });
+          }
+        });
+      } catch (e) {}
 
       const mapaPorNome = new Map();
 
@@ -295,18 +375,21 @@
       });
 
       salvosNoNavegador.forEach(p => {
-        if (p && p.nome) {
+        if (p && p.nome && typeof p.nome === 'string') {
           const chave = p.nome.trim().toLowerCase();
           if (!mapaPorNome.has(chave)) {
             mapaPorNome.set(chave, {
-              id: p.id || Date.now() + Math.floor(Math.random() * 1000),
+              id: p.id || Date.now() + Math.floor(Math.random() * 10000),
               nome: p.nome.trim(),
               conv: p.conv || 'PARTICULAR',
               cid: p.cid || 'F84.0',
               dn: p.dn || ''
             });
-          } else if (p.dn && !mapaPorNome.get(chave).dn) {
-            mapaPorNome.get(chave).dn = p.dn;
+          } else {
+            const existente = mapaPorNome.get(chave);
+            if (p.dn && !existente.dn) existente.dn = p.dn;
+            if (p.cid && !existente.cid) existente.cid = p.cid;
+            if (p.conv && !existente.conv) existente.conv = p.conv;
           }
         }
       });
@@ -364,7 +447,6 @@
       }
     ];
 
-    // TRANSFORMADOR TÉCNICO DE DIFICULDADES/DESAFIOS (NUNCA COPIA O TEXTO CRU)
     function transformarDesafiosEmTextoTecnico(desafiosRaw) {
       if (!desafiosRaw) {
         return 'Mantém-se o monitoramento contínuo das demandas sensório-motoras, práxicas e funcionais para consolidação das aquisições e ampliação do repertório ocupacional.';
@@ -408,6 +490,13 @@
       if (valorAtual) select.value = valorAtual;
       document.getElementById('total-pacientes-badge').innerText = listaPacientes.length;
 
+      // Se houver apenas os 30 base (nenhum extra encontrado nesta origem de pasta), exibe dica rápida de importação/backup
+      if (listaPacientes.length <= pacientesBaseOficial.length) {
+        document.getElementById('banner-recuperacao').classList.remove('hidden');
+      } else {
+        document.getElementById('banner-recuperacao').classList.add('hidden');
+      }
+
       const areaTexto = document.getElementById('rel-corpo-evolucao');
       areaTexto.addEventListener('input', () => {
         document.getElementById('rel-corpo-print').innerText = areaTexto.value;
@@ -440,6 +529,45 @@
 
     function fecharModalPaciente() {
       document.getElementById('modal-paciente').classList.add('hidden');
+    }
+
+    function abrirModalImportarLote() {
+      document.getElementById('modal-lote').classList.remove('hidden');
+    }
+
+    function fecharModalImportarLote() {
+      document.getElementById('modal-lote').classList.add('hidden');
+    }
+
+    function processarImportacaoLote() {
+      const texto = document.getElementById('texto-lote-pacientes').value.trim();
+      if (!texto) return;
+      const linhas = texto.split(/?
+/).map(l => l.trim()).filter(l => l.length > 1);
+      let adicionados = 0;
+
+      const existentes = new Set(listaPacientes.map(p => p.nome.trim().toLowerCase()));
+
+      linhas.forEach((linha, idx) => {
+        const chave = linha.toLowerCase();
+        if (!existentes.has(chave)) {
+          listaPacientes.push({
+            id: Date.now() + idx,
+            nome: linha,
+            conv: 'PARTICULAR',
+            cid: 'F84.0',
+            dn: ''
+          });
+          existentes.add(chave);
+          adicionados++;
+        }
+      });
+
+      localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(listaPacientes));
+      init();
+      fecharModalImportarLote();
+      document.getElementById('texto-lote-pacientes').value = '';
+      alert(`${adicionados} paciente(s) novo(s) adicionado(s) com sucesso em ordem alfabética!`);
     }
 
     function salvarNovoPaciente(e) {
@@ -527,7 +655,6 @@
       let refPeriodo = periodo ? `referente ao período de ${periodo}` : 'ao longo dos atendimentos realizados';
       let intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento terapêutico ocupacional especializado, apresentando evolução clínica consistente ${refPeriodo}. As intervenções foram conduzidas sob a abordagem de Integração Sensorial e desenvolvimento psicomotor, visando otimizar suas respostas adaptativas e o desempenho funcional.`;
 
-      // Identifica todos os domínios técnicos acionados pelas palavras-chave (SEM NUNCA COPIAR O TEXTO DO USUÁRIO)
       let paragrafosTecnicos = [];
       dominiosClinicosTO.forEach(dominio => {
         if (dominio.chaves.some(chave => textoLower.includes(chave))) {
@@ -535,7 +662,6 @@
         }
       });
 
-      // Fallback técnico rico caso o usuário escreva uma atividade genérica (sem nunca repetir o texto cru entre parênteses)
       if (paragrafosTecnicos.length === 0) {
         paragrafosTecnicos.push(
           'No âmbito do desenvolvimento sensório-motor e funcional, foram implementadas atividades terapêuticas estruturadas voltadas à modulação sensorial, ao planejamento motor (praxia) e ao refinamento das habilidades manuais. Observou-se resposta adaptativa favorável diante das demandas propostas, evidenciando avanços na organização corporal, na sustentação atencional e na eficiência da execução ocupacional.'
@@ -544,7 +670,6 @@
           'Adicionalmente, durante a vivência das propostas lúdico-terapêuticas, verificou-se maior estabilidade postural, aprimoramento da coordenação óculo-manual e evolução progressiva na iniciativa e autonomia para resolução de tarefas sequenciadas.'
         );
       } else if (paragrafosTecnicos.length === 1) {
-        // Se apenas 1 domínio foi detectado, complementa com um segundo parágrafo técnico de integração funcional para o relatório ficar robusto e completo
         paragrafosTecnicos.push(
           'De modo integrado ao desempenho observado, evidenciou-se também evolução na organização práxica geral, com melhor sequenciamento das ações durante as etapas das atividades, maior estabilidade postural e respostas adaptativas mais eficientes às demandas ambientais.'
         );
@@ -746,15 +871,43 @@ Terapeuta Ocupacional`;
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (imported.pacientes) {
-            localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(imported.pacientes));
+          let pacientesImportados = [];
+
+          if (Array.isArray(imported)) {
+            pacientesImportados = imported;
+          } else if (imported.pacientes) {
+            pacientesImportados = imported.pacientes;
+          } else if (imported.data && imported.data.pacientes) {
+            pacientesImportados = imported.data.pacientes;
           }
+
+          if (pacientesImportados.length > 0) {
+            const mapa = new Map();
+            listaPacientes.forEach(p => mapa.set(p.nome.trim().toLowerCase(), p));
+            pacientesImportados.forEach(p => {
+              if (p && p.nome) {
+                const k = p.nome.trim().toLowerCase();
+                if (!mapa.has(k)) {
+                  mapa.set(k, {
+                    id: p.id || Date.now() + Math.floor(Math.random() * 10000),
+                    nome: p.nome.trim(),
+                    conv: p.conv || 'PARTICULAR',
+                    cid: p.cid || 'F84.0',
+                    dn: p.dn || ''
+                  });
+                }
+              }
+            });
+            localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(Array.from(mapa.values())));
+          }
+
           if (imported.evolucoes) {
             historicoEvolucoesSalvas = { ...historicoEvolucoesSalvas, ...imported.evolucoes };
             localStorage.setItem('gestaoTO_evolucoes_salvas', JSON.stringify(historicoEvolucoesSalvas));
           }
+
           init();
-          alert('Backup restaurado com sucesso! Todos os pacientes e evoluções foram carregados.');
+          alert(`Importação concluída com sucesso! Total agora: ${listaPacientes.length} pacientes.`);
         } catch (err) {
           alert('Arquivo de backup inválido.');
         }
