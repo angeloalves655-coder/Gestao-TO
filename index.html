@@ -69,8 +69,8 @@
           <i class="fa-solid fa-notes-medical"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">EVOLUÇÃO</span></h1>
-          <p class="text-xs text-slate-400">Relatórios de Evolução Claros para os Pais & Família</p>
+          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">EVOLUÇÃO CLÍNICA</span></h1>
+          <p class="text-xs text-slate-400">Motor Inteligente de Redação Técnica em Terapia Ocupacional</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-2">
@@ -80,8 +80,8 @@
         <button onclick="exportarBackup()" title="Baixar cópia de segurança de todos os pacientes e evoluções" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-download mr-1"></i> Backup
         </button>
-        <label title="Restaurar arquivo de backup" class="cursor-pointer px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center">
-          <i class="fa-solid fa-upload mr-1"></i> Restaurar
+        <label title="Restaurar arquivo de backup (.json) ou importar pacientes de outra versão" class="cursor-pointer px-3 py-2 bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/30 text-xs font-semibold rounded-xl transition flex items-center">
+          <i class="fa-solid fa-upload mr-1"></i> Importar / Restaurar
           <input type="file" accept=".json" onchange="importarBackup(event)" class="hidden">
         </label>
       </div>
@@ -90,15 +90,31 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
+    <!-- Aviso de Sincronização de Pacientes -->
+    <div id="banner-recuperacao" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 no-print flex flex-wrap items-center justify-between gap-3 text-xs text-amber-200">
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-circle-info text-amber-400 text-base"></i>
+        <span>Se você abriu o arquivo em uma pasta diferente no computador, o navegador cria um armazenamento separado. Clique em <strong>Importar / Restaurar</strong> acima para carregar seu arquivo <code>Backup_GestaoTO.json</code> ou cole os nomes em lote abaixo.</span>
+      </div>
+      <button onclick="abrirModalImportarLote()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition whitespace-nowrap">
+        + Colar Lista de Pacientes
+      </button>
+    </div>
+
     <!-- PAINEL DE ENTRADA RÁPIDA -->
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 no-print space-y-5 shadow-lg">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
         <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-teal-400"></i> Registro Rápido de Evolução
+          <i class="fa-solid fa-pen-to-square text-teal-400"></i> Registro Rápido de Sessão / Período
         </h2>
-        <span class="text-[11px] text-emerald-400 flex items-center gap-1">
-          <i class="fa-solid fa-cloud-check"></i> Salvamento Automático Ativo
-        </span>
+        <div class="flex items-center gap-3">
+          <button onclick="abrirModalImportarLote()" class="text-[11px] text-teal-300 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-users"></i> Importar vários nomes
+          </button>
+          <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+            <i class="fa-solid fa-cloud-check"></i> Salvamento Automático
+          </span>
+        </div>
       </div>
 
       <!-- Seleção de Paciente e Dados Rápidos -->
@@ -131,12 +147,12 @@
           <input type="text" id="periodo-input" placeholder="Ex: Mês de Novembro/2026 ou Sessões Semanais" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Como a criança participou:</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Resposta Geral & Engajamento:</label>
           <select id="comportamento-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
             <option value="excelente">Boa evolução, participativo(a), atento(a) e colaborativo(a)</option>
-            <option value="moderado">Evolução gradual, precisando de ajuda verbal/física pontual</option>
-            <option value="agitado">Momentos de agitação, mas respondeu bem às atividades para acalmar</option>
-            <option value="resistent">Resistência no início, mas foi aceitando aos poucos</option>
+            <option value="moderado">Evolução gradual, necessitando de mediação verbal/física pontual</option>
+            <option value="agitado">Oscilação no nível de alerta/agitação, respondendo bem à regulação</option>
+            <option value="resistent">Resistência inicial às propostas, evoluindo após facilitação sensorial</option>
           </select>
         </div>
       </div>
@@ -144,19 +160,19 @@
       <!-- Relato Simples -->
       <div>
         <label class="block text-xs font-semibold text-slate-300 mb-1.5">
-          O que a criança fez e como evoluiu? (Escreva de forma bem simples) *
+          Anotação rápida (O sistema reescreve 100% em linguagem técnica sem copiar suas palavras) *
         </label>
-        <textarea id="texto-simples" rows="4" placeholder="Ex: Brincou na piscina de bolinhas, subiu na rampa do circuito, apertou massinha e conseguiu recortar papel com tesoura. Melhorou o equilíbrio e aceitou melhor o toque." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-slate-100 focus:border-teal-500 outline-none text-sm leading-relaxed"></textarea>
+        <textarea id="texto-simples" rows="4" placeholder="Ex: Brincou com pino de encaixe, melhorou a pinça, andou na linha reta com equilíbrio, aceitou pegar na espuma e na massinha, manteve foco na atividade..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-slate-100 focus:border-teal-500 outline-none text-sm leading-relaxed"></textarea>
       </div>
 
       <!-- Desafios / Próximos Passos -->
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Dificuldades que ainda persistem (Opcional):</label>
-        <input type="text" id="desafios-input" placeholder="Ex: Ainda cansa rápido na escrita, tem dificuldade em esperar a vez..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Dificuldades ou demandas que ainda persistem (Opcional):</label>
+        <input type="text" id="desafios-input" placeholder="Ex: cansa rápido na escrita, dificuldade em esperar a vez, troca de turno, desatenção, birra..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
       </div>
 
       <button onclick="gerarEvolucaoCompleta()" class="w-full py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-base">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório de Evolução
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório Técnico Completo
       </button>
     </div>
 
@@ -178,7 +194,7 @@
 
       <!-- Corpo da Evolução Editável na Tela -->
       <div>
-        <textarea id="rel-corpo-evolucao" rows="16" oninput="ajustarAlturaTextarea(this)" class="w-full text-black text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 outline-none no-print" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;"></textarea>
+        <textarea id="rel-corpo-evolucao" rows="18" oninput="ajustarAlturaTextarea(this)" class="w-full text-black text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 outline-none no-print" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;"></textarea>
         
         <!-- Div espelho para impressão completa sem cortes -->
         <div id="rel-corpo-print"></div>
@@ -209,7 +225,7 @@
 
   </main>
 
-  <!-- Modal Adicionar Paciente -->
+  <!-- Modal Adicionar Paciente Individual -->
   <div id="modal-paciente" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md space-y-4">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -240,6 +256,22 @@
           <button type="submit" class="px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-xl text-xs">Salvar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Importar Vários Pacientes em Lote -->
+  <div id="modal-lote" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-lg space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-base font-bold text-slate-100">Importar Lista de Pacientes (Um por linha)</h3>
+        <button onclick="fecharModalImportarLote()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-slate-300">Cole os nomes dos pacientes que você tinha cadastrado (um nome por linha). O sistema adiciona todos sem duplicar os que já existem:</p>
+      <textarea id="texto-lote-pacientes" rows="8" placeholder="Ex:&#10;Arthur Silva Santos&#10;Enzo Gabriel Oliveira&#10;Helena Costa Lima" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 text-sm outline-none focus:border-teal-500"></textarea>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="fecharModalImportarLote()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs">Cancelar</button>
+        <button type="button" onclick="processarImportacaoLote()" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl text-xs">Adicionar Todos à Lista</button>
+      </div>
     </div>
   </div>
 
@@ -277,16 +309,64 @@
       { id: 123, nome: 'Yuri Azuma', conv: 'SAVI', cid: 'F84.0', dn: '' }
     ];
 
+    // VARREDURA COMPLETA EM TODAS AS CHAVES POSSÍVEIS DO LOCALSTORAGE
     function carregarEMesclarPacientes() {
       let salvosNoNavegador = [];
+      const chavesConhecidas = [
+        'gestaoTO_lista_pacientes',
+        'gestaoTO_pro_data',
+        'gestaoTO_pacientes',
+        'pacientes_to',
+        'pacientes'
+      ];
+
+      chavesConhecidas.forEach(chave => {
+        try {
+          const bruto = localStorage.getItem(chave);
+          if (!bruto) return;
+          const parsed = JSON.parse(bruto);
+          if (Array.isArray(parsed)) {
+            salvosNoNavegador.push(...parsed);
+          } else if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.pacientes)) salvosNoNavegador.push(...parsed.pacientes);
+            if (Array.isArray(parsed.listaPacientes)) salvosNoNavegador.push(...parsed.listaPacientes);
+          }
+        } catch (e) {}
+      });
+
+      // Também varre qualquer outra chave do localStorage que contenha objetos com "nome"
       try {
-        const raw1 = JSON.parse(localStorage.getItem('gestaoTO_lista_pacientes')) || [];
-        const raw2 = JSON.parse(localStorage.getItem('gestaoTO_pro_data'));
-        const arr2 = (raw2 && Array.isArray(raw2.pacientes)) ? raw2.pacientes : [];
-        salvosNoNavegador = [...raw1, ...arr2];
-      } catch (e) {
-        salvosNoNavegador = [];
-      }
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (chavesConhecidas.includes(k)) continue;
+          const val = localStorage.getItem(k);
+          if (val && val.includes('"nome"')) {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) {
+              salvosNoNavegador.push(...parsed.filter(item => item && item.nome && !item.textoCompleto));
+            } else if (parsed && Array.isArray(parsed.pacientes)) {
+              salvosNoNavegador.push(...parsed.pacientes);
+            }
+          }
+        }
+      } catch (e) {}
+
+      // Também extrai nomes de pacientes que já tenham evoluções salvas em gestaoTO_evolucoes_salvas
+      try {
+        const evs = JSON.parse(localStorage.getItem('gestaoTO_evolucoes_salvas')) || {};
+        Object.keys(evs).forEach(pId => {
+          const arr = evs[pId];
+          if (Array.isArray(arr) && arr.length > 0 && arr[0].pacienteNome) {
+            salvosNoNavegador.push({
+              id: parseInt(pId) || Date.now(),
+              nome: arr[0].pacienteNome,
+              conv: arr[0].convenio || 'PARTICULAR',
+              cid: arr[0].cid || 'F84.0',
+              dn: arr[0].dnFormatada || ''
+            });
+          }
+        });
+      } catch (e) {}
 
       const mapaPorNome = new Map();
 
@@ -295,18 +375,21 @@
       });
 
       salvosNoNavegador.forEach(p => {
-        if (p && p.nome) {
+        if (p && p.nome && typeof p.nome === 'string') {
           const chave = p.nome.trim().toLowerCase();
           if (!mapaPorNome.has(chave)) {
             mapaPorNome.set(chave, {
-              id: p.id || Date.now() + Math.floor(Math.random() * 1000),
+              id: p.id || Date.now() + Math.floor(Math.random() * 10000),
               nome: p.nome.trim(),
               conv: p.conv || 'PARTICULAR',
               cid: p.cid || 'F84.0',
               dn: p.dn || ''
             });
-          } else if (p.dn && !mapaPorNome.get(chave).dn) {
-            mapaPorNome.get(chave).dn = p.dn;
+          } else {
+            const existente = mapaPorNome.get(chave);
+            if (p.dn && !existente.dn) existente.dn = p.dn;
+            if (p.cid && !existente.cid) existente.cid = p.cid;
+            if (p.conv && !existente.conv) existente.conv = p.conv;
           }
         }
       });
@@ -320,45 +403,83 @@
     let historicoEvolucoesSalvas = JSON.parse(localStorage.getItem('gestaoTO_evolucoes_salvas')) || {};
     let relatorioAtualEmEdicao = null;
 
-    // LINGUAGEM CLARA, ACOLHEDORA E FÁCIL DOS PAIS ENTENDEREM (Sem termos técnicos difíceis, mantendo todo o conteúdo)
-    const mapeamentoEvolucaoTO = [
+    // BANCO EXPANDIDO DE DOMÍNIOS CLÍNICOS EM TERAPIA OCUPACIONAL (NUNCA COPIA AS PALAVRAS DO USUÁRIO)
+    const dominiosClinicosTO = [
       {
-        chaves: ['piscina de bolinhas', 'bolinha', 'bolinhas', 'imersão', 'imersao'],
-        paragrafo: 'Na parte sensorial, realizamos brincadeiras na piscina de bolinhas para trabalhar o tato e a percepção do próprio corpo. Durante a atividade, a criança respondeu muito bem aos estímulos, ficando mais organizada corporalmente, tranquila e atenta.'
+        id: 'tato_propriocepcao_imersao',
+        chaves: ['piscina', 'bolinha', 'imersão', 'imersao', 'espuma', 'areia', 'arroz', 'feijão', 'feijao', 'massinha', 'argila', 'amoeba', 'slime', 'textura', 'toque', 'tátil', 'tatil', 'apertar', 'amassar', 'sujar', 'sensorial'],
+        paragrafo: 'No âmbito da Integração Sensorial (sistemas tátil e proprioceptivo), foram realizadas intervenções com exploração de diferentes texturas, densidades e estímulos de pressão profunda. Observou-se resposta adaptativa favorável na modulação da sensibilidade tátil, com redução gradual de comportamentos defensivos, maior tolerância ao contato sensorial e melhor organização do esquema corporal.'
       },
       {
-        chaves: ['circuito', 'rampa', 'túnel', 'tunel', 'ponte', 'obstáculo', 'obstaculo', 'subir', 'pular', 'equilíbrio', 'equilibrio'],
-        paragrafo: 'Em relação aos movimentos do corpo e coordenação motora ampla, a criança participou de circuitos com rampas e obstáculos. Foi possível notar uma melhora no equilíbrio, na postura e na facilidade para planejar e realizar cada movimento do percurso.'
+        id: 'vestibular_postura_equilibrio',
+        chaves: ['balanço', 'balanco', 'rede', 'trapézio', 'trapezio', 'suspensão', 'suspenso', 'girar', 'balançar', 'bola', 'bobath', 'rolo', 'gangorra', 'equilíbrio', 'equilibrio', 'postura', 'tronco', 'cair', 'plataforma'],
+        paragrafo: 'Quanto ao processamento vestibular-proprioceptivo e controle postural, foram conduzidas atividades dinâmicas envolvendo deslocamentos lineares, rotacionais e ajustes em superfícies instáveis. Evidenciou-se evolução significativa nas reações de retificação e equilíbrio, maior estabilidade proximal (cocontração de tronco e cintura escapular) e ampliação da segurança gravitacional.'
       },
       {
-        chaves: ['massinha', 'argila', 'amoeba', 'slime', 'textura', 'modelar', 'apertar', 'toque'],
-        paragrafo: 'Nas atividades com diferentes texturas, como a massinha de modelar, observou-se que a criança está aceitando melhor o toque nos materiais, sem tanto incômodo, o que também ajuda a fortalecer a musculatura das mãos e dos dedos.'
+        id: 'motricidade_ampla_praxia',
+        chaves: ['circuito', 'rampa', 'túnel', 'tunel', 'ponte', 'obstáculo', 'obstaculo', 'subir', 'pular', 'saltar', 'andar', 'linha', 'correr', 'arremessar', 'jogar bola', 'chutar', 'rastejar', 'engatinhar', 'coordenação motora', 'coordenacao motora', 'ampla', 'grossa', 'praxia', 'planejamento', 'movimento'],
+        paragrafo: 'Em relação ao desempenho motor global e praxia, a criança participou de circuitos psicomotores estruturados contemplando transposição de obstáculos, mudanças de plano e coordenação de membros. Verifica-se avanço no planejamento motor (ideação, sequenciamento e execução), dissociação de cinturas, coordenação bilateral e agilidade nos deslocamentos espaciais.'
       },
       {
-        chaves: ['balanço', 'balanco', 'rede', 'trapézio', 'trapezio', 'suspensão', 'suspenso', 'girar', 'balançar'],
-        paragrafo: 'Com o uso de brinquedos suspensos, como o balanço e a rede, trabalhamos o equilíbrio e a noção de movimento no espaço. A criança demonstrou mais firmeza no tronco e sentiu-se mais segura e confiante durante as brincadeiras.'
+        id: 'motricidade_fina_pinca_manipulacao',
+        chaves: ['pinça', 'pinca', 'pino', 'encaixe', 'encaixar', 'pegar', 'prender', 'pregador', 'conta', 'miçanga', 'micanga', 'alinhavo', 'botão', 'botao', 'zíper', 'ziper', 'fechar', 'abrir', 'rosca', 'tampa', 'peça', 'peca', 'lego', 'bloco', 'torre', 'empilhar', 'fina', 'dedo', 'mão', 'mao', 'preensão', 'preensao'],
+        paragrafo: 'No domínio da motricidade fina e destreza manual, foram propostas atividades direcionadas ao refinamento da preensão digital (pinça polpa-a-polpa e pinça trípode), manipulação intra-manual e coordenação óculo-manual. Constatou-se ganho de precisão nos movimentos distais, melhor graduação de força e maior eficiência no manuseio de objetos de pequeno porte.'
       },
       {
-        chaves: ['tesoura', 'recorte', 'recortar', 'cortar', 'papel'],
-        paragrafo: 'No treino das habilidades manuais, principalmente no uso da tesoura, a criança mostrou evolução na coordenação entre as duas mãos (segurando o papel com uma mão enquanto recorta com a outra) e maior controle ao acompanhar o desenho.'
+        id: 'tesoura_bimanual_grafismo',
+        chaves: ['tesoura', 'recorte', 'recortar', 'cortar', 'papel', 'lápis', 'lapis', 'giz', 'caneta', 'desenho', 'desenhar', 'pintura', 'pintar', 'colorir', 'grafismo', 'escrever', 'escrita', 'traço', 'traco', 'linha', 'contorno', 'letra', 'copiar'],
+        paragrafo: 'No treino de habilidades instrumentais e desempenho gráfico, explorou-se o uso funcional da tesoura e de instrumentos de escrita. Observou-se progresso expressivo na integração bimanual (estabilização ativa do suporte com a mão não dominante enquanto a dominante executa o movimento), adequação da preensão funcional e maior controle visomotor nos traçados e recortes.'
       },
       {
-        chaves: ['lápis', 'lapis', 'desenho', 'pintura', 'pinça', 'pinca', 'grafismo', 'escrever', 'traço', 'traco'],
-        paragrafo: 'Quanto à coordenação motora fina e atividades com lápis, realizamos propostas para melhorar a forma de segurar o lápis e fazer o movimento de pinça com os dedos. Percebe-se avanço no controle da força no papel e mais firmeza nos traços e desenhos.'
+        id: 'funcoes_executivas_cognitivo_atencao',
+        chaves: ['quebra-cabeça', 'quebra cabeça', 'jogo', 'memória', 'memoria', 'regra', 'esperar', 'vez', 'turno', 'atenção', 'atencao', 'foco', 'concentração', 'concentracao', 'terminar', 'concluir', 'sequência', 'sequencia', 'cor', 'forma', 'pareamento', 'classificar', 'organizar', 'frustração', 'frustracao'],
+        paragrafo: 'No âmbito cognitivo-ocupacional e das funções executivas, mediante jogos estruturados com demandas de sequenciamento lógico e regras simples, notou-se ampliação do tempo de atenção sustentada e seletiva, maior controle inibitório, respeito à alternância de turnos e evolução na tolerância à frustração diante de desafios.'
       },
       {
-        chaves: ['quebra-cabeça', 'quebra cabeça', 'jogo', 'encaixe', 'memória', 'memoria', 'regra', 'esperar', 'vez', 'atenção', 'atencao', 'foco'],
-        paragrafo: 'Na parte de atenção e concentração, por meio de jogos de encaixe e brincadeiras com regras simples, a criança conseguiu manter o foco por mais tempo, lidar melhor com pequenas frustrações e esperar a sua vez de jogar.'
+        id: 'avds_autonomia_alimentacao_vestuario',
+        chaves: ['comida', 'alimentação', 'alimentacao', 'seletividade', 'talher', 'colher', 'garfo', 'copo', 'mastigar', 'comer', 'vestir', 'tirar', 'roupa', 'tênis', 'tenis', 'sapato', 'meia', 'banheiro', 'escovar', 'dente', 'lavar', 'avd', 'autonomia', 'independência', 'independencia'],
+        paragrafo: 'No contexto das Atividades de Vida Diária (AVDs), os treinos funcionais voltados à promoção da independência demonstraram evolução consistente, com maior organização práxica, aceitação sensorial e iniciativa para a execução das rotinas de autocuidado e alimentação com redução gradual do nível de assistência.'
       },
       {
-        chaves: ['comida', 'alimentação', 'alimentacao', 'seletividade', 'talher', 'copo', 'mastigar', 'comer', 'vestir', 'roupa', 'banheiro', 'avd'],
-        paragrafo: 'Em relação às atividades do dia a dia (como alimentação, vestir-se e higiene), os treinos voltados para a autonomia mostraram avanços, com maior aceitação e facilidade para realizar as tarefas sozinha ou com pouca ajuda.'
-      },
-      {
-        chaves: ['contato visual', 'interação', 'interacao', 'brincar', 'compartilhada', 'comunicação', 'comunicacao', 'chamado'],
-        paragrafo: 'Na interação social durante os atendimentos, notou-se maior troca de olhares e contato com o terapeuta, dividindo melhor a atenção nas brincadeiras e respondendo de forma mais ativa quando chamada.'
+        id: 'interacao_social_comunicacao_brincar',
+        chaves: ['contato visual', 'olhar', 'interação', 'interacao', 'brincar', 'compartilhada', 'comunicação', 'comunicacao', 'chamado', 'responder', 'apontar', 'pedir', 'imitou', 'imitação', 'imitacao', 'simbólico', 'simbolico', 'faz de conta', 'social', 'vínculo', 'vinculo'],
+        paragrafo: 'No aspecto socioemocional e engajamento lúdico, destaca-se maior reciprocidade na interação terapêutica, ampliação da atenção compartilhada e do contato visual intencional, além de evolução no brincar funcional e simbólico com respostas comunicativas mais assertivas durante as sessões.'
       }
     ];
+
+    function transformarDesafiosEmTextoTecnico(desafiosRaw) {
+      if (!desafiosRaw) {
+        return 'Mantém-se o monitoramento contínuo das demandas sensório-motoras, práxicas e funcionais para consolidação das aquisições e ampliação do repertório ocupacional.';
+      }
+
+      const dLower = desafiosRaw.toLowerCase();
+      let aspectosTecnicos = [];
+
+      if (/(escrita|lápis|lapis|cansa|fadiga|força|forca|traço|traco|recorte|tesoura|pinça|pinca)/.test(dLower)) {
+        aspectosTecnicos.push('aprimoramento da resistência muscular intrínseca e coordenação motora fina durante demandas gráficas e instrumentais');
+      }
+      if (/(atenção|atencao|foco|distrai|dispersa|concentra|terminar|concluir)/.test(dLower)) {
+        aspectosTecnicos.push('ampliação do tempo de atenção sustentada e autorregulação cognitiva frente a estímulos concorrentes');
+      }
+      if (/(vez|turno|esperar|frustra|birra|impulsiv|agitad|calma|emoç|emoc|raiva|chor)/.test(dLower)) {
+        aspectosTecnicos.push('fortalecimento do controle inibitório, manejo emocional diante de frustrações e respeito à alternância de turnos');
+      }
+      if (/(toque|textura|seletiv|comida|aliment|barulho|som|sensorial|medo|insegur)/.test(dLower)) {
+        aspectosTecnicos.push('dessensibilização gradual e modulação sensorial frente a estímulos específicos do ambiente');
+      }
+      if (/(equilíbrio|equilibrio|postura|cair|coordenação|coordenacao|pular|circuito|movimento|planej)/.test(dLower)) {
+        aspectosTecnicos.push('refinamento do planejamento motor (praxia) e estabilidade postural em tarefas motoras complexas');
+      }
+      if (/(autonomia|vestir|banheiro|roupa|talher|independência|independencia|avd)/.test(dLower)) {
+        aspectosTecnicos.push('generalização da autonomia funcional nas Atividades de Vida Diária (AVDs)');
+      }
+
+      if (aspectosTecnicos.length > 0) {
+        return `Como metas terapêuticas prioritárias para a continuidade do plano de intervenção, destacam-se o trabalho direcionado para: ${aspectosTecnicos.join('; ')}.`;
+      } else {
+        return 'Como pontos de atenção que demandam continuidade de intervenção especializada, observa-se a necessidade de sustentar os estímulos de regulação comportamental, planejamento motor e adaptação funcional diante de demandas de maior complexidade.';
+      }
+    }
 
     function init() {
       listaPacientes = carregarEMesclarPacientes();
@@ -368,6 +489,13 @@
         listaPacientes.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
       if (valorAtual) select.value = valorAtual;
       document.getElementById('total-pacientes-badge').innerText = listaPacientes.length;
+
+      // Se houver apenas os 30 base (nenhum extra encontrado nesta origem de pasta), exibe dica rápida de importação/backup
+      if (listaPacientes.length <= pacientesBaseOficial.length) {
+        document.getElementById('banner-recuperacao').classList.remove('hidden');
+      } else {
+        document.getElementById('banner-recuperacao').classList.add('hidden');
+      }
 
       const areaTexto = document.getElementById('rel-corpo-evolucao');
       areaTexto.addEventListener('input', () => {
@@ -401,6 +529,45 @@
 
     function fecharModalPaciente() {
       document.getElementById('modal-paciente').classList.add('hidden');
+    }
+
+    function abrirModalImportarLote() {
+      document.getElementById('modal-lote').classList.remove('hidden');
+    }
+
+    function fecharModalImportarLote() {
+      document.getElementById('modal-lote').classList.add('hidden');
+    }
+
+    function processarImportacaoLote() {
+      const texto = document.getElementById('texto-lote-pacientes').value.trim();
+      if (!texto) return;
+      const linhas = texto.split(/?
+/).map(l => l.trim()).filter(l => l.length > 1);
+      let adicionados = 0;
+
+      const existentes = new Set(listaPacientes.map(p => p.nome.trim().toLowerCase()));
+
+      linhas.forEach((linha, idx) => {
+        const chave = linha.toLowerCase();
+        if (!existentes.has(chave)) {
+          listaPacientes.push({
+            id: Date.now() + idx,
+            nome: linha,
+            conv: 'PARTICULAR',
+            cid: 'F84.0',
+            dn: ''
+          });
+          existentes.add(chave);
+          adicionados++;
+        }
+      });
+
+      localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(listaPacientes));
+      init();
+      fecharModalImportarLote();
+      document.getElementById('texto-lote-pacientes').value = '';
+      alert(`${adicionados} paciente(s) novo(s) adicionado(s) com sucesso em ordem alfabética!`);
     }
 
     function salvarNovoPaciente(e) {
@@ -478,41 +645,46 @@
       const periodo = document.getElementById('periodo-input').value.trim();
 
       if(!pId) return alert('Por favor, selecione um paciente!');
-      if(!textoSimples) return alert('Escreva de forma simples o que aconteceu ou como a criança evoluiu.');
+      if(!textoSimples) return alert('Escreva sua anotação rápida sobre o que foi trabalhado ou observado.');
 
       const p = listaPacientes.find(x => x.id === pId);
       const primeiroNome = p.nome.split(' ')[0];
       const dnFormatada = formatarDataBR(p.dn);
       const textoLower = textoSimples.toLowerCase();
 
-      let refPeriodo = periodo ? `durante o período de ${periodo}` : 'ao longo dos atendimentos realizados';
-      let intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento na Terapia Ocupacional, apresentando evolução positiva ${refPeriodo}.`;
+      let refPeriodo = periodo ? `referente ao período de ${periodo}` : 'ao longo dos atendimentos realizados';
+      let intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento terapêutico ocupacional especializado, apresentando evolução clínica consistente ${refPeriodo}. As intervenções foram conduzidas sob a abordagem de Integração Sensorial e desenvolvimento psicomotor, visando otimizar suas respostas adaptativas e o desempenho funcional.`;
 
       let paragrafosTecnicos = [];
-      mapeamentoEvolucaoTO.forEach(item => {
-        if (item.chaves.some(chave => textoLower.includes(chave))) {
-          paragrafosTecnicos.push(item.paragrafo);
+      dominiosClinicosTO.forEach(dominio => {
+        if (dominio.chaves.some(chave => textoLower.includes(chave))) {
+          paragrafosTecnicos.push(dominio.paragrafo);
         }
       });
 
       if (paragrafosTecnicos.length === 0) {
         paragrafosTecnicos.push(
-          `Durante os atendimentos de Terapia Ocupacional, realizamos brincadeiras e atividades direcionadas para desenvolver a coordenação motora, os sentidos e a autonomia, incluindo vivências práticas (${textoSimples}). Observou-se boa resposta da criança, com avanços na organização do comportamento, nos movimentos e na participação.`
+          'No âmbito do desenvolvimento sensório-motor e funcional, foram implementadas atividades terapêuticas estruturadas voltadas à modulação sensorial, ao planejamento motor (praxia) e ao refinamento das habilidades manuais. Observou-se resposta adaptativa favorável diante das demandas propostas, evidenciando avanços na organização corporal, na sustentação atencional e na eficiência da execução ocupacional.'
+        );
+        paragrafosTecnicos.push(
+          'Adicionalmente, durante a vivência das propostas lúdico-terapêuticas, verificou-se maior estabilidade postural, aprimoramento da coordenação óculo-manual e evolução progressiva na iniciativa e autonomia para resolução de tarefas sequenciadas.'
+        );
+      } else if (paragrafosTecnicos.length === 1) {
+        paragrafosTecnicos.push(
+          'De modo integrado ao desempenho observado, evidenciou-se também evolução na organização práxica geral, com melhor sequenciamento das ações durante as etapas das atividades, maior estabilidade postural e respostas adaptativas mais eficientes às demandas ambientais.'
         );
       }
 
       let mapaComportamento = {
-        'excelente': `Sobre o comportamento e participação, ${primeiroNome} mostrou-se participativo(a), colaborativo(a) e interessado(a) nas atividades propostas, mantendo um bom vínculo durante as sessões.`,
-        'moderado': `Em relação à participação, ${primeiroNome} apresentou evolução aos poucos, conseguindo realizar as atividades com o apoio de orientações verbais e ajuda pontual para manter a atenção.`,
-        'agitado': `Quanto ao comportamento, houve momentos de maior agitação e dificuldade para manter a calma, mas a criança respondeu bem às atividades corporais feitas para ajudá-la a se organizar.`,
-        'resistent': `No início das sessões, ${primeiroNome} demonstrou um pouco de resistência às novidades, mas foi aceitando melhor as brincadeiras e os estímulos conforme se sentiu mais seguro(a) no ambiente.`
+        'excelente': `No que tange ao perfil comportamental e nível de alerta, ${primeiroNome} manteve-se participativo(a), colaborativo(a) e com boa receptividade às demandas terapêuticas, demonstrando vínculo positivo, regulação emocional adequada e engajamento ativo nas atividades propostas.`,
+        'moderado': `Em relação ao engajamento e participação, ${primeiroNome} apresentou evolução gradual e consistente, respondendo satisfatoriamente às demandas terapêuticas mediante mediação verbal e pistas sensório-motoras pontuais para sustentação do foco atencional.`,
+        'agitado': `Quanto à modulação do nível de alerta e regulação comportamental, observaram-se oscilações e momentos de maior agitação psicomotora, sendo empregadas estratégias sensoriais proprioceptivas e vestibulares que favoreceram sua autorregulação e retorno ao eixo organizacional.`,
+        'resistent': `No aspecto comportamental, ${primeiroNome} apresentou inicialmente certa resistência e cautela frente a novos estímulos, evoluindo progressivamente para maior segurança, vinculação terapêutica e aceitação ativa após adaptação gradual do setting e facilitação sensorial.`
       };
 
-      let textoDesafios = desafios
-        ? `Como pontos que ainda precisam continuar sendo trabalhados nas próximas sessões, destacam-se: ${desafios}.`
-        : `Seguimos acompanhando e estimulando o desenvolvimento motor, sensorial e a independência para fortalecer tudo o que já foi conquistado.`;
+      let textoDesafios = transformarDesafiosEmTextoTecnico(desafios);
 
-      let conclusao = `Diante dos avanços observados, indica-se a continuidade dos atendimentos em Terapia Ocupacional para seguir estimulando sua autonomia, o bem-estar sensorial e o desempenho nas atividades do dia a dia e da escola.`;
+      let conclusao = `Diante dos ganhos clínicos evidenciados, indica-se a continuidade do acompanhamento em Terapia Ocupacional com vistas à consolidação das habilidades adquiridas, ao aprimoramento do processamento sensorial e à generalização da autonomia funcional para os contextos domiciliar e escolar.`;
 
       const textoFinalEvolucao = [
         intro,
@@ -520,7 +692,9 @@
         mapaComportamento[comportamento],
         textoDesafios,
         conclusao
-      ].join('\n\n');
+      ].join('
+
+');
 
       const agora = new Date();
       const dataHoraStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -582,8 +756,11 @@
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
       const paragrafosHTML = texto
-        .split(/\n\s*\n/)
-        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/\n/g, '<br>')}</p>`)
+        .split(/
+\s*
+/)
+        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/
+/g, '<br>')}</p>`)
         .join('');
 
       const htmlWord = `
@@ -628,7 +805,7 @@
         </html>
       `;
 
-      const blob = new Blob(['\ufeff', htmlWord], { type: 'application/msword;charset=utf-8' });
+      const blob = new Blob(['﻿', htmlWord], { type: 'application/msword;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const nomeLimpo = nome.replace(/[^a-zA-Z0-9À-ÿ\s]/g, '').trim().replace(/\s+/g, '_');
@@ -645,10 +822,19 @@
       const dn = document.getElementById('doc-dn').innerText;
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
-      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL\n\nNome: ${nome}\nData de nascimento: ${dn}\n\n${texto}\n\n__________________________________________\nAngelo José Alves\nTerapeuta Ocupacional`;
+      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
+
+Nome: ${nome}
+Data de nascimento: ${dn}
+
+${texto}
+
+__________________________________________
+Angelo José Alves
+Terapeuta Ocupacional`;
 
       navigator.clipboard.writeText(completo).then(() => {
-        alert('Relatório completo copiado! Basta colar no Word.');
+        alert('Relatório técnico completo copiado! Basta colar no Word.');
       }).catch(() => {
         const textarea = document.getElementById('rel-corpo-evolucao');
         textarea.select();
@@ -685,15 +871,43 @@
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (imported.pacientes) {
-            localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(imported.pacientes));
+          let pacientesImportados = [];
+
+          if (Array.isArray(imported)) {
+            pacientesImportados = imported;
+          } else if (imported.pacientes) {
+            pacientesImportados = imported.pacientes;
+          } else if (imported.data && imported.data.pacientes) {
+            pacientesImportados = imported.data.pacientes;
           }
+
+          if (pacientesImportados.length > 0) {
+            const mapa = new Map();
+            listaPacientes.forEach(p => mapa.set(p.nome.trim().toLowerCase(), p));
+            pacientesImportados.forEach(p => {
+              if (p && p.nome) {
+                const k = p.nome.trim().toLowerCase();
+                if (!mapa.has(k)) {
+                  mapa.set(k, {
+                    id: p.id || Date.now() + Math.floor(Math.random() * 10000),
+                    nome: p.nome.trim(),
+                    conv: p.conv || 'PARTICULAR',
+                    cid: p.cid || 'F84.0',
+                    dn: p.dn || ''
+                  });
+                }
+              }
+            });
+            localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(Array.from(mapa.values())));
+          }
+
           if (imported.evolucoes) {
             historicoEvolucoesSalvas = { ...historicoEvolucoesSalvas, ...imported.evolucoes };
             localStorage.setItem('gestaoTO_evolucoes_salvas', JSON.stringify(historicoEvolucoesSalvas));
           }
+
           init();
-          alert('Backup restaurado com sucesso! Todos os pacientes e evoluções foram carregados.');
+          alert(`Importação concluída com sucesso! Total agora: ${listaPacientes.length} pacientes.`);
         } catch (err) {
           alert('Arquivo de backup inválido.');
         }
