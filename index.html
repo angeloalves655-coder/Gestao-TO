@@ -596,8 +596,7 @@
     function processarImportacaoLote() {
       const texto = document.getElementById('texto-lote-pacientes').value.trim();
       if (!texto) return;
-      const linhas = texto.split(/?
-/).map(l => l.trim()).filter(l => l.length > 1);
+      const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 1);
       let adicionados = 0;
 
       const existentes = new Set(listaPacientes.map(p => p.nome.trim().toLowerCase()));
@@ -770,9 +769,7 @@
         paragrafoComportamento,
         textoDesafios,
         conclusao
-      ].join('
-
-');
+      ].join('\n\n');
 
       const agora = new Date();
       const dataHoraStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -834,11 +831,8 @@
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
       const paragrafosHTML = texto
-        .split(/
-\s*
-/)
-        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/
-/g, '<br>')}</p>`)
+        .split(/\n\s*\n/)
+        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/\n/g, '<br>')}</p>`)
         .join('');
 
       const htmlWord = `
@@ -900,16 +894,7 @@
       const dn = document.getElementById('doc-dn').innerText;
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
-      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
-
-Nome: ${nome}
-Data de nascimento: ${dn}
-
-${texto}
-
-__________________________________________
-Angelo José Alves
-Terapeuta Ocupacional`;
+      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL\n\nNome: ${nome}\nData de nascimento: ${dn}\n\n${texto}\n\n__________________________________________\nAngelo José Alves\nTerapeuta Ocupacional`;
 
       navigator.clipboard.writeText(completo).then(() => {
         alert('Relatório técnico completo copiado! Basta colar no Word.');
