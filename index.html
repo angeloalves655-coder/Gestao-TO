@@ -8,24 +8,54 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     @media print {
+      @page {
+        margin: 2cm;
+        size: A4 portrait;
+      }
       .no-print { display: none !important; }
-      body { background: white !important; color: black !important; font-size: 11pt; }
+      html, body {
+        background: white !important;
+        color: black !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 12pt !important;
+      }
+      main {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       .card-print { 
         border: none !important; 
         box-shadow: none !important; 
         padding: 0 !important; 
         max-width: 100% !important; 
         margin: 0 !important;
+        display: block !important;
       }
-      textarea {
-        border: none !important;
-        resize: none !important;
-        outline: none !important;
-        padding: 0 !important;
-        background: transparent !important;
-        height: auto !important;
-        overflow: visible !important;
+      #rel-corpo-evolucao {
+        display: none !important;
       }
+      #rel-corpo-print {
+        display: block !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        color: black !important;
+        text-align: justify !important;
+        white-space: pre-wrap !important;
+      }
+    }
+    #rel-corpo-print {
+      display: none;
+    }
+    .documento-arial-12 {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12pt;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -40,7 +70,7 @@
         </div>
         <div>
           <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">EVOLUÇÃO</span></h1>
-          <p class="text-xs text-slate-400">Transformador de Anotações Simples em Evolução Clínica T.O.</p>
+          <p class="text-xs text-slate-400">Relatórios de Evolução Claros para os Pais & Família</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-2">
@@ -81,7 +111,7 @@
         </div>
 
         <div class="flex items-center justify-around text-xs text-slate-400 bg-slate-900/60 p-3 rounded-xl border border-slate-700/50">
-          <div>Convênio: <span id="info-conv" class="text-teal-400 font-bold block text-sm">-</span></div>
+          <div>Nasc.: <span id="info-dn" class="text-teal-400 font-bold block text-sm">-</span></div>
           <div>CID-10: <span id="info-cid" class="text-slate-200 font-bold block text-sm">-</span></div>
         </div>
       </div>
@@ -97,16 +127,16 @@
       <!-- Período ou Data da Evolução -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Período / Referência da Evolução:</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Período / Referência da Evolução (Opcional):</label>
           <input type="text" id="periodo-input" placeholder="Ex: Mês de Novembro/2026 ou Sessões Semanais" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Resposta Geral & Engajamento:</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Como a criança participou:</label>
           <select id="comportamento-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
             <option value="excelente">Boa evolução, participativo(a), atento(a) e colaborativo(a)</option>
-            <option value="moderado">Evolução gradual, necessitando de mediação verbal/física pontual</option>
-            <option value="agitado">Oscilação no nível de alerta/agitação, respondendo bem à regulação</option>
-            <option value="resistent">Resistência inicial às propostas, evoluindo após facilitação sensorial</option>
+            <option value="moderado">Evolução gradual, precisando de ajuda verbal/física pontual</option>
+            <option value="agitado">Momentos de agitação, mas respondeu bem às atividades para acalmar</option>
+            <option value="resistent">Resistência no início, mas foi aceitando aos poucos</option>
           </select>
         </div>
       </div>
@@ -126,40 +156,53 @@
       </div>
 
       <button onclick="gerarEvolucaoCompleta()" class="w-full py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-base">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Transformar em Relatório de Evolução Completo
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório de Evolução
       </button>
     </div>
 
-    <!-- PREVIEW DO RELATÓRIO DE EVOLUÇÃO -->
-    <div id="relatorio-out" class="hidden bg-white text-slate-900 p-8 md:p-12 rounded-2xl shadow-2xl space-y-5 card-print">
+    <!-- PREVIEW DO RELATÓRIO DE EVOLUÇÃO (PADRÃO VISUAL LIMPO - ARIAL 12) -->
+    <div id="relatorio-out" class="hidden bg-white text-black p-8 md:p-14 rounded-2xl shadow-2xl card-print documento-arial-12">
       
-      <div class="text-center border-b-2 pb-4 border-slate-800">
-        <h1 class="text-lg font-bold tracking-wide text-slate-900 uppercase">RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL</h1>
-        <p class="text-xs text-slate-600 mt-1" id="print-clinica">Acompanhamento Terapêutico Ocupacional Infantil</p>
+      <!-- Título Centralizado -->
+      <div class="text-center mb-6">
+        <h1 class="font-normal uppercase tracking-normal text-black" style="font-family: Arial, sans-serif; font-size: 12pt;">
+          RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
+        </h1>
       </div>
 
-      <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-800" id="print-identificacao"></div>
+      <!-- Cabeçalho do Paciente -->
+      <div class="mb-6 text-black" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;" id="print-identificacao">
+        <p><strong>Nome:</strong> <span id="doc-nome"></span></p>
+        <p><strong>Data de nascimento:</strong> <span id="doc-dn"></span></p>
+      </div>
 
+      <!-- Corpo da Evolução Editável na Tela -->
       <div>
-        <h2 class="text-xs font-bold text-teal-800 uppercase tracking-wider mb-1.5 border-b border-slate-300 pb-1">
-          Evolução Clínica e Desempenho Ocupacional
-        </h2>
-        <textarea id="rel-corpo-evolucao" rows="14" class="w-full text-xs text-slate-800 leading-relaxed text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 resize-y outline-none"></textarea>
-        <p class="text-[10px] text-slate-400 mt-1 no-print">* Dica: Você pode clicar diretamente no texto acima para editar qualquer palavra antes de imprimir (as edições feitas aqui também são salvas automaticamente).</p>
+        <textarea id="rel-corpo-evolucao" rows="16" oninput="ajustarAlturaTextarea(this)" class="w-full text-black text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 outline-none no-print" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;"></textarea>
+        
+        <!-- Div espelho para impressão completa sem cortes -->
+        <div id="rel-corpo-print"></div>
+
+        <p class="text-[11px] text-slate-500 mt-1.5 no-print font-sans">* Clique no texto acima para editar qualquer detalhe antes de baixar no Word ou Imprimir.</p>
       </div>
 
-      <div class="pt-10 text-center mt-6">
-        <div class="w-64 border-b border-slate-800 mx-auto mb-1"></div>
-        <p class="font-bold text-slate-900 text-xs">Angelo José Alves</p>
-        <p class="text-[11px] text-slate-600">Terapeuta Ocupacional</p>
+      <!-- Assinatura Profissional -->
+      <div class="pt-12 text-center mt-8" style="font-family: Arial, sans-serif; font-size: 12pt;">
+        <div class="w-64 border-b border-black mx-auto mb-1"></div>
+        <p class="font-bold text-black">Angelo José Alves</p>
+        <p class="text-black">Terapeuta Ocupacional</p>
       </div>
 
-      <div class="flex justify-end gap-3 no-print pt-4 border-t border-slate-200">
-        <button onclick="copiarTextoEvolucao()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2">
-          <i class="fa-solid fa-copy"></i> Copiar Texto
+      <!-- Barra de Ações (Baixar Word, Copiar, Imprimir/PDF) -->
+      <div class="flex flex-wrap justify-end gap-3 no-print pt-6 mt-6 border-t border-slate-200 font-sans">
+        <button onclick="copiarTextoCompletoWord()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2">
+          <i class="fa-solid fa-copy"></i> Copiar Tudo
         </button>
-        <button onclick="window.print()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
-          <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
+        <button onclick="baixarArquivoWord()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-file-word"></i> Baixar em Word (.doc - Arial 12)
+        </button>
+        <button onclick="imprimirRelatorio()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
+          <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF Completo
         </button>
       </div>
     </div>
@@ -180,13 +223,17 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs text-slate-400 mb-1">Convênio</label>
-            <input type="text" id="novo-pac-conv" placeholder="Ex: UNIMED, SAVI" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 text-sm outline-none focus:border-teal-500">
+            <label class="block text-xs text-slate-400 mb-1">Data de Nascimento</label>
+            <input type="date" id="novo-pac-dn" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 text-sm outline-none focus:border-teal-500">
           </div>
           <div>
             <label class="block text-xs text-slate-400 mb-1">CID-10</label>
             <input type="text" id="novo-pac-cid" value="F84.0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 text-sm outline-none focus:border-teal-500">
           </div>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Convênio</label>
+          <input type="text" id="novo-pac-conv" placeholder="Ex: UNIMED, SAVI, PARTICULAR" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-100 text-sm outline-none focus:border-teal-500">
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="fecharModalPaciente()" class="px-4 py-2 bg-slate-700 text-slate-300 rounded-xl text-xs">Cancelar</button>
@@ -197,7 +244,6 @@
   </div>
 
   <script>
-    // BASE COMPLETA DE PACIENTES CADASTRADOS (30 PACIENTES)
     const pacientesBaseOficial = [
       { id: 102, nome: 'Bernardo Marinho Mota', conv: 'SAVI', cid: 'F84.0', dn: '' },
       { id: 1021, nome: 'Bernardo Martins de Castro', conv: 'SAVI', cid: 'F84.0', dn: '2021-05-14' },
@@ -231,7 +277,6 @@
       { id: 123, nome: 'Yuri Azuma', conv: 'SAVI', cid: 'F84.0', dn: '' }
     ];
 
-    // MESCLA AUTOMÁTICA: Garante que TODOS os pacientes da base oficial + qualquer paciente que você já cadastrou ou venha a cadastrar nunca sejam perdidos!
     function carregarEMesclarPacientes() {
       let salvosNoNavegador = [];
       try {
@@ -245,12 +290,10 @@
 
       const mapaPorNome = new Map();
 
-      // 1. Insere todos da base oficial
       pacientesBaseOficial.forEach(p => {
         mapaPorNome.set(p.nome.trim().toLowerCase(), { ...p });
       });
 
-      // 2. Mescla qualquer paciente adicional salvo anteriormente no navegador sem duplicar
       salvosNoNavegador.forEach(p => {
         if (p && p.nome) {
           const chave = p.nome.trim().toLowerCase();
@@ -262,6 +305,8 @@
               cid: p.cid || 'F84.0',
               dn: p.dn || ''
             });
+          } else if (p.dn && !mapaPorNome.get(chave).dn) {
+            mapaPorNome.get(chave).dn = p.dn;
           }
         }
       });
@@ -273,44 +318,45 @@
 
     let listaPacientes = carregarEMesclarPacientes();
     let historicoEvolucoesSalvas = JSON.parse(localStorage.getItem('gestaoTO_evolucoes_salvas')) || {};
-    let relatorioAtualEmEdicao = null; // { pacienteId, index }
+    let relatorioAtualEmEdicao = null;
 
+    // LINGUAGEM CLARA, ACOLHEDORA E FÁCIL DOS PAIS ENTENDEREM (Sem termos técnicos difíceis, mantendo todo o conteúdo)
     const mapeamentoEvolucaoTO = [
       {
         chaves: ['piscina de bolinhas', 'bolinha', 'bolinhas', 'imersão', 'imersao'],
-        paragrafo: 'No âmbito da Integração Sensorial, foram exploradas vivências de imersão corporal (piscina de bolinhas), proporcionando entrada proprioceptiva e tátil profunda. Observou-se resposta adaptativa favorável na modulação da sensibilidade tátil, contribuindo diretamente para a organização do esquema corporal e autorregulação do nível de alerta.'
+        paragrafo: 'Na parte sensorial, realizamos brincadeiras na piscina de bolinhas para trabalhar o tato e a percepção do próprio corpo. Durante a atividade, a criança respondeu muito bem aos estímulos, ficando mais organizada corporalmente, tranquila e atenta.'
       },
       {
         chaves: ['circuito', 'rampa', 'túnel', 'tunel', 'ponte', 'obstáculo', 'obstaculo', 'subir', 'pular', 'equilíbrio', 'equilibrio'],
-        paragrafo: 'Em relação ao desempenho motor global e praxia, a criança participou de circuitos psicomotores estruturados envolvendo transposição de obstáculos, rampas e mudanças de planos. Evidenciou-se evolução significativa no planejamento motor (praxia global), ajuste postural dinâmico, equilíbrio e coordenação bilateral durante os deslocamentos.'
+        paragrafo: 'Em relação aos movimentos do corpo e coordenação motora ampla, a criança participou de circuitos com rampas e obstáculos. Foi possível notar uma melhora no equilíbrio, na postura e na facilidade para planejar e realizar cada movimento do percurso.'
       },
       {
         chaves: ['massinha', 'argila', 'amoeba', 'slime', 'textura', 'modelar', 'apertar', 'toque'],
-        paragrafo: 'Nas propostas de estimulação tátil e manipulação de materiais de diferentes resistências e texturas (como massinha de modelar), notou-se maior tolerância ao contato tátil e diminuição de respostas defensivas, além do fortalecimento da musculatura intrínseca das mãos, favorecendo a graduação de força.'
+        paragrafo: 'Nas atividades com diferentes texturas, como a massinha de modelar, observou-se que a criança está aceitando melhor o toque nos materiais, sem tanto incômodo, o que também ajuda a fortalecer a musculatura das mãos e dos dedos.'
       },
       {
         chaves: ['balanço', 'balanco', 'rede', 'trapézio', 'trapezio', 'suspensão', 'suspenso', 'girar', 'balançar'],
-        paragrafo: 'Através da utilização de equipamentos suspensos com estímulos vestibulares lineares e rotacionais, trabalhou-se o processamento vestibular-proprioceptivo. A criança demonstrou evolução nas reações de retificação e equilíbrio, mantendo maior estabilidade postural (cocontração de tronco) e segurança gravitacional.'
+        paragrafo: 'Com o uso de brinquedos suspensos, como o balanço e a rede, trabalhamos o equilíbrio e a noção de movimento no espaço. A criança demonstrou mais firmeza no tronco e sentiu-se mais segura e confiante durante as brincadeiras.'
       },
       {
         chaves: ['tesoura', 'recorte', 'recortar', 'cortar', 'papel'],
-        paragrafo: 'No treino de habilidades manuais instrumentais, especificamente no manuseio de tesoura, observou-se avanço na dissociação de movimentos digitais, integração bimanual (uma mão estabiliza o papel enquanto a outra executa o corte) e coordenação visomotora.'
+        paragrafo: 'No treino das habilidades manuais, principalmente no uso da tesoura, a criança mostrou evolução na coordenação entre as duas mãos (segurando o papel com uma mão enquanto recorta com a outra) e maior controle ao acompanhar o desenho.'
       },
       {
         chaves: ['lápis', 'lapis', 'desenho', 'pintura', 'pinça', 'pinca', 'grafismo', 'escrever', 'traço', 'traco'],
-        paragrafo: 'Quanto à motricidade fina e desempenho gráfico, foram realizadas atividades direcionadas ao refinamento da preensão digital. Verifica-se evolução no controle biomecânico da pinça, melhor modulação da pressão exercida sobre o instrumento gráfico e maior precisão nos traçados.'
+        paragrafo: 'Quanto à coordenação motora fina e atividades com lápis, realizamos propostas para melhorar a forma de segurar o lápis e fazer o movimento de pinça com os dedos. Percebe-se avanço no controle da força no papel e mais firmeza nos traços e desenhos.'
       },
       {
         chaves: ['quebra-cabeça', 'quebra cabeça', 'jogo', 'encaixe', 'memória', 'memoria', 'regra', 'esperar', 'vez', 'atenção', 'atencao', 'foco'],
-        paragrafo: 'No domínio cognitivo-ocupacional e das funções executivas, mediante jogos estruturados e atividades de encaixe com regras simples, a criança apresentou ampliação do tempo de atenção sustentada, melhor tolerância à frustração, respeito à alternância de turnos e capacidade de resolução de problemas.'
+        paragrafo: 'Na parte de atenção e concentração, por meio de jogos de encaixe e brincadeiras com regras simples, a criança conseguiu manter o foco por mais tempo, lidar melhor com pequenas frustrações e esperar a sua vez de jogar.'
       },
       {
         chaves: ['comida', 'alimentação', 'alimentacao', 'seletividade', 'talher', 'copo', 'mastigar', 'comer', 'vestir', 'roupa', 'banheiro', 'avd'],
-        paragrafo: 'No contexto das Atividades de Vida Diária (AVDs), os estímulos voltados à autonomia funcional demonstraram progressos na independência ocupacional, com maior aceitação sensorial e organização motora para a execução das tarefas cotidianas.'
+        paragrafo: 'Em relação às atividades do dia a dia (como alimentação, vestir-se e higiene), os treinos voltados para a autonomia mostraram avanços, com maior aceitação e facilidade para realizar as tarefas sozinha ou com pouca ajuda.'
       },
       {
         chaves: ['contato visual', 'interação', 'interacao', 'brincar', 'compartilhada', 'comunicação', 'comunicacao', 'chamado'],
-        paragrafo: 'No aspecto socioemocional e de engajamento ocupacional, destaca-se maior abertura para a interação terapêutica, ampliação da atenção compartilhada e respostas mais intencionais diante das solicitações verbais e gestuais durante o brincar.'
+        paragrafo: 'Na interação social durante os atendimentos, notou-se maior troca de olhares e contato com o terapeuta, dividindo melhor a atenção nas brincadeiras e respondendo de forma mais ativa quando chamada.'
       }
     ];
 
@@ -323,9 +369,9 @@
       if (valorAtual) select.value = valorAtual;
       document.getElementById('total-pacientes-badge').innerText = listaPacientes.length;
 
-      // Salva automaticamente qualquer edição manual feita no relatório gerado
       const areaTexto = document.getElementById('rel-corpo-evolucao');
       areaTexto.addEventListener('input', () => {
+        document.getElementById('rel-corpo-print').innerText = areaTexto.value;
         if (relatorioAtualEmEdicao) {
           const { pacienteId, index } = relatorioAtualEmEdicao;
           if (historicoEvolucoesSalvas[pacienteId] && historicoEvolucoesSalvas[pacienteId][index]) {
@@ -334,6 +380,19 @@
           }
         }
       });
+    }
+
+    function ajustarAlturaTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = (el.scrollHeight + 10) + 'px';
+    }
+
+    function formatarDataBR(dn) {
+      if (!dn) return '';
+      if (dn.includes('/')) return dn;
+      const partes = dn.split('-');
+      if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      return dn;
     }
 
     function abrirModalNovoPaciente() {
@@ -347,11 +406,12 @@
     function salvarNovoPaciente(e) {
       e.preventDefault();
       const nome = document.getElementById('novo-pac-nome').value.trim();
+      const dn = document.getElementById('novo-pac-dn').value;
       const conv = document.getElementById('novo-pac-conv').value.trim() || 'PARTICULAR';
       const cid = document.getElementById('novo-pac-cid').value.trim() || 'F84.0';
       if(!nome) return;
 
-      const novo = { id: Date.now(), nome, conv, cid, dn: '' };
+      const novo = { id: Date.now(), nome, conv, cid, dn };
       listaPacientes.push(novo);
       localStorage.setItem('gestaoTO_lista_pacientes', JSON.stringify(listaPacientes));
       init();
@@ -364,7 +424,7 @@
     function atualizarInfoPaciente(val) {
       const containerHistorico = document.getElementById('container-historico-relatorios');
       if(!val) {
-        document.getElementById('info-conv').innerText = '-';
+        document.getElementById('info-dn').innerText = '-';
         document.getElementById('info-cid').innerText = '-';
         containerHistorico.classList.add('hidden');
         return;
@@ -372,7 +432,7 @@
       const pId = parseInt(val);
       const p = listaPacientes.find(x => x.id === pId);
       if(p) {
-        document.getElementById('info-conv').innerText = p.conv || 'SAVI';
+        document.getElementById('info-dn').innerText = p.dn ? formatarDataBR(p.dn) : 'Não inf.';
         document.getElementById('info-cid').innerText = p.cid || 'F84.0';
         carregarHistoricoRelatorios(pId);
       }
@@ -422,11 +482,11 @@
 
       const p = listaPacientes.find(x => x.id === pId);
       const primeiroNome = p.nome.split(' ')[0];
-      const dnFormatada = p.dn ? new Date(p.dn + 'T00:00:00').toLocaleDateString('pt-BR') : 'Não informada';
+      const dnFormatada = formatarDataBR(p.dn);
       const textoLower = textoSimples.toLowerCase();
 
-      let refPeriodo = periodo ? `referente ao período de ${periodo}` : 'ao longo dos atendimentos realizados';
-      let intro = `O(A) paciente ${p.nome}, sob diagnóstico/hipótese CID-10: ${p.cid || 'F84.0'}, encontra-se em acompanhamento terapêutico ocupacional, apresentando evolução clínica ${refPeriodo}.`;
+      let refPeriodo = periodo ? `durante o período de ${periodo}` : 'ao longo dos atendimentos realizados';
+      let intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento na Terapia Ocupacional, apresentando evolução positiva ${refPeriodo}.`;
 
       let paragrafosTecnicos = [];
       mapeamentoEvolucaoTO.forEach(item => {
@@ -437,22 +497,22 @@
 
       if (paragrafosTecnicos.length === 0) {
         paragrafosTecnicos.push(
-          `Durante as sessões de Terapia Ocupacional, foram propostas atividades terapêuticas estruturadas voltadas ao desenvolvimento sensório-motor e funcional, contemplando vivências práticas (${textoSimples}). Observou-se resposta adaptativa positiva, com ganhos progressivos na organização comportamental, planejamento motor e engajamento nas ocupações propostas.`
+          `Durante os atendimentos de Terapia Ocupacional, realizamos brincadeiras e atividades direcionadas para desenvolver a coordenação motora, os sentidos e a autonomia, incluindo vivências práticas (${textoSimples}). Observou-se boa resposta da criança, com avanços na organização do comportamento, nos movimentos e na participação.`
         );
       }
 
       let mapaComportamento = {
-        'excelente': `No que tange ao comportamento e nível de alerta, ${primeiroNome} manteve-se participativo(a), colaborativo(a) e com boa receptividade às demandas terapêuticas, demonstrando vínculo positivo e engajamento ativo nas atividades.`,
-        'moderado': `Em relação à participação, ${primeiroNome} apresentou evolução gradual, respondendo satisfatoriamente às atividades mediante mediação verbal e dicas visuais/físicas pontuais para sustentação do foco.`,
-        'agitado': `Quanto à regulação comportamental, observaram-se oscilações no nível de alerta e momentos de maior agitação psicomotora, sendo utilizadas estratégias sensoriais proprioceptivas e vestibulares que favoreceram sua reorganização.`,
-        'resistent': `Inicialmente, ${primeiroNome} apresentou certa resistência perante novos estímulos e demandas, evoluindo com maior segurança e aceitação após adaptação gradual do ambiente e facilitação sensorial.`
+        'excelente': `Sobre o comportamento e participação, ${primeiroNome} mostrou-se participativo(a), colaborativo(a) e interessado(a) nas atividades propostas, mantendo um bom vínculo durante as sessões.`,
+        'moderado': `Em relação à participação, ${primeiroNome} apresentou evolução aos poucos, conseguindo realizar as atividades com o apoio de orientações verbais e ajuda pontual para manter a atenção.`,
+        'agitado': `Quanto ao comportamento, houve momentos de maior agitação e dificuldade para manter a calma, mas a criança respondeu bem às atividades corporais feitas para ajudá-la a se organizar.`,
+        'resistent': `No início das sessões, ${primeiroNome} demonstrou um pouco de resistência às novidades, mas foi aceitando melhor as brincadeiras e os estímulos conforme se sentiu mais seguro(a) no ambiente.`
       };
 
       let textoDesafios = desafios
-        ? `Como pontos de atenção que demandam continuidade de estímulo terapêutico, observam-se: ${desafios}.`
-        : `Mantém-se o monitoramento contínuo das demandas sensório-motoras e funcionais para consolidação das habilidades adquiridas.`;
+        ? `Como pontos que ainda precisam continuar sendo trabalhados nas próximas sessões, destacam-se: ${desafios}.`
+        : `Seguimos acompanhando e estimulando o desenvolvimento motor, sensorial e a independência para fortalecer tudo o que já foi conquistado.`;
 
-      let conclusao = `Diante da evolução apresentada, recomenda-se a continuidade do acompanhamento em Terapia Ocupacional visando potencializar a autonomia funcional, o processamento sensorial adequado e a generalização das conquistas para os ambientes familiar e escolar.`;
+      let conclusao = `Diante dos avanços observados, indica-se a continuidade dos atendimentos em Terapia Ocupacional para seguir estimulando sua autonomia, o bem-estar sensorial e o desempenho nas atividades do dia a dia e da escola.`;
 
       const textoFinalEvolucao = [
         intro,
@@ -469,7 +529,7 @@
         dataHora: dataHoraStr,
         periodo: periodo,
         pacienteNome: p.nome,
-        dnFormatada,
+        dnFormatada: dnFormatada,
         convenio: p.conv || 'SAVI',
         cid: p.cid || 'F84.0',
         textoCompleto: textoFinalEvolucao
@@ -487,15 +547,15 @@
     }
 
     function exibirRelatorioNaTela(reg) {
-      document.getElementById('print-identificacao').innerHTML = `
-        <p><strong>Paciente:</strong> ${reg.pacienteNome}</p>
-        <p><strong>Convênio:</strong> ${reg.convenio}</p>
-        <p><strong>CID-10:</strong> ${reg.cid}</p>
-        <p><strong>Data de Emissão:</strong> ${reg.dataHora.split(' ')[0]}</p>
-      `;
+      document.getElementById('doc-nome').innerText = reg.pacienteNome;
+      document.getElementById('doc-dn').innerText = reg.dnFormatada || '';
 
-      document.getElementById('rel-corpo-evolucao').value = reg.textoCompleto;
+      const areaTexto = document.getElementById('rel-corpo-evolucao');
+      areaTexto.value = reg.textoCompleto;
+      document.getElementById('rel-corpo-print').innerText = reg.textoCompleto;
+
       document.getElementById('relatorio-out').classList.remove('hidden');
+      ajustarAlturaTextarea(areaTexto);
       document.getElementById('relatorio-out').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -516,14 +576,93 @@
       }
     }
 
-    function copiarTextoEvolucao() {
-      const textarea = document.getElementById('rel-corpo-evolucao');
-      textarea.select();
-      document.execCommand('copy');
-      alert('Texto da evolução copiado para a área de transferência!');
+    function baixarArquivoWord() {
+      const nome = document.getElementById('doc-nome').innerText;
+      const dn = document.getElementById('doc-dn').innerText;
+      const texto = document.getElementById('rel-corpo-evolucao').value;
+
+      const paragrafosHTML = texto
+        .split(/\n\s*\n/)
+        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/\n/g, '<br>')}</p>`)
+        .join('');
+
+      const htmlWord = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>Relatório de Evolução - ${nome}</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 2.5cm 2.5cm 2.5cm 2.5cm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 12pt;
+              line-height: 1.5;
+              color: #000000;
+            }
+          </style>
+        </head>
+        <body>
+          <p style="font-family: Arial, sans-serif; font-size: 12pt; text-align: center; margin-bottom: 24pt; color: #000000;">
+            RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
+          </p>
+
+          <p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 0; color: #000000;">
+            <strong>Nome:</strong> ${nome}
+          </p>
+          <p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 18pt; color: #000000;">
+            <strong>Data de nascimento:</strong> ${dn}
+          </p>
+
+          ${paragrafosHTML}
+
+          <br><br><br>
+          <p style="font-family: Arial, sans-serif; font-size: 12pt; text-align: center; margin-bottom: 0; color: #000000;">
+            __________________________________________<br>
+            <strong>Angelo José Alves</strong><br>
+            Terapeuta Ocupacional
+          </p>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff', htmlWord], { type: 'application/msword;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const nomeLimpo = nome.replace(/[^a-zA-Z0-9À-ÿ\s]/g, '').trim().replace(/\s+/g, '_');
+      a.href = url;
+      a.download = `Relatorio_Evolucao_${nomeLimpo}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
-    // EXPORTAR / IMPORTAR BACKUP (Garante 100% de segurança ao atualizar o index.html)
+    function copiarTextoCompletoWord() {
+      const nome = document.getElementById('doc-nome').innerText;
+      const dn = document.getElementById('doc-dn').innerText;
+      const texto = document.getElementById('rel-corpo-evolucao').value;
+
+      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL\n\nNome: ${nome}\nData de nascimento: ${dn}\n\n${texto}\n\n__________________________________________\nAngelo José Alves\nTerapeuta Ocupacional`;
+
+      navigator.clipboard.writeText(completo).then(() => {
+        alert('Relatório completo copiado! Basta colar no Word.');
+      }).catch(() => {
+        const textarea = document.getElementById('rel-corpo-evolucao');
+        textarea.select();
+        document.execCommand('copy');
+        alert('Texto copiado para a área de transferência!');
+      });
+    }
+
+    function imprimirRelatorio() {
+      const texto = document.getElementById('rel-corpo-evolucao').value;
+      document.getElementById('rel-corpo-print').innerText = texto;
+      window.print();
+    }
+
     function exportarBackup() {
       const dadosBackup = {
         dataExportacao: new Date().toISOString(),
