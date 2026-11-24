@@ -785,7 +785,8 @@
     function processarImportacaoLote() {
       const texto = document.getElementById('texto-lote-pacientes').value.trim();
       if (!texto) return;
-      const linhas = texto.split(/?
+      const linhas = texto.split(/
+?
 /).map(l => l.trim()).filter(l => l.length > 1);
       let adicionados = 0;
       const existentes = new Set(listaPacientes.map(p => p.nome.trim().toLowerCase()));
@@ -1026,9 +1027,7 @@
         conclusao
       ].filter(b => b && b.trim().length > 0);
 
-      const textoFinalEvolucao = blocos.join('
-
-');
+      const textoFinalEvolucao = blocos.join('\n\n');
 
       const agora = new Date();
       const dataHoraStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -1090,11 +1089,8 @@
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
       const paragrafosHTML = texto
-        .split(/
-\s*
-/)
-        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/
-/g, '<br>')}</p>`)
+        .split(/\n\s*\n/)
+        .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/\n/g, '<br>')}</p>`)
         .join('');
 
       const htmlWord = `
