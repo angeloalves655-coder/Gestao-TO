@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GestãoTO Pro - Plano Terapêutico & Evolução Clínica</title>
+  <title>GestãoTO Pro v15 - Prontuário & Relatório Clínico TO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -73,15 +73,15 @@
           <i class="fa-solid fa-notes-medical"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">PLANO + EVOLUÇÃO PRO</span></h1>
-          <p class="text-xs text-slate-400">Plano Terapêutico Oficial + Relatório de Evolução Funcional (46 Pacientes)</p>
+          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">v15 • GUIA CLÍNICO TO</span></h1>
+          <p class="text-xs text-slate-400">Evolução de Prontuário (3 Pilares) + Plano Terapêutico + Relatório de Período</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-2">
         <button onclick="abrirModalNovoPaciente()" class="px-3 py-2 bg-teal-600/30 hover:bg-teal-600/50 text-teal-300 border border-teal-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-user-plus mr-1"></i> + Paciente
         </button>
-        <button onclick="exportarBackup()" title="Baixar cópia de segurança de todos os pacientes, planos e evoluções" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
+        <button onclick="exportarBackup()" title="Baixar cópia de segurança de todos os pacientes, planos e registros" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-download mr-1"></i> Backup
         </button>
         <label title="Restaurar arquivo de backup (.json)" class="cursor-pointer px-3 py-2 bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/30 text-xs font-semibold rounded-xl transition flex items-center">
@@ -98,7 +98,7 @@
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 no-print space-y-5 shadow-lg">
       <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-700 pb-3">
         <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
-          <i class="fa-solid fa-clipboard-list text-teal-400"></i> Prontuário: Plano Terapêutico & Evolução
+          <i class="fa-solid fa-clipboard-list text-teal-400"></i> Prontuário Clínico: Registro de Sessão & Relatório
         </h2>
         <div class="flex items-center gap-3">
           <button onclick="abrirModalImportarLote()" class="text-[11px] text-teal-300 hover:underline flex items-center gap-1">
@@ -110,7 +110,69 @@
         </div>
       </div>
 
-      <!-- Seleção de Paciente -->
+      <!-- 1. SELETOR DO TIPO DE DOCUMENTO (EVOLUÇÃO DE PRONTUÁRIO VS RELATÓRIO) -->
+      <div class="bg-slate-950/60 border border-teal-500/40 rounded-2xl p-4 space-y-3">
+        <label class="block text-xs font-bold text-teal-300 uppercase tracking-wider">
+          <i class="fa-solid fa-file-medical mr-1"></i> 1. Qual registro clínico deseja gerar?
+        </label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <label class="cursor-pointer border border-teal-500 bg-teal-500/15 rounded-xl p-3.5 flex items-start gap-3 transition" id="card-tipo-sessao">
+            <input type="radio" name="tipo-documento" value="sessao" checked onchange="alternarTipoDocumento(this.value)" class="mt-1 accent-teal-400">
+            <div>
+              <span class="block text-xs font-bold text-teal-300">Evolução de Prontuário (Sessão Pontual — 3 Pilares)</span>
+              <span class="block text-[11px] text-slate-300 mt-0.5">Registro objetivo da sessão do dia: <strong>Objetivo • Estratégia/Procedimento • Resposta Observada</strong> (sem julgamentos).</span>
+            </div>
+          </label>
+          <label class="cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3.5 flex items-start gap-3 transition" id="card-tipo-relatorio">
+            <input type="radio" name="tipo-documento" value="relatorio" onchange="alternarTipoDocumento(this.value)" class="mt-1 accent-teal-400">
+            <div>
+              <span class="block text-xs font-bold text-slate-200">Relatório de Evolução (Síntese de Período)</span>
+              <span class="block text-[11px] text-slate-400 mt-0.5">Análise longitudinal do percurso terapêutico: objetivos, procedimentos, consistência, generalização e continuidade.</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Sub-opção para Evolução de Sessão -->
+        <div id="subopcoes-sessao" class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-4 text-xs">
+            <span class="text-slate-400 font-semibold">Formato da Evolução:</span>
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-200">
+              <input type="radio" name="formato-sessao" value="estruturado" checked class="accent-teal-400">
+              <span>Blocos (Objetivo / Estratégia / Resposta)</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-200">
+              <input type="radio" name="formato-sessao" value="corrido" class="accent-teal-400">
+              <span>Parágrafo Único Corrido</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-400">Data da Sessão:</label>
+            <input type="date" id="data-sessao-input" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-100 outline-none focus:border-teal-500">
+          </div>
+        </div>
+
+        <!-- Sub-opção para Relatório de Período -->
+        <div id="subopcoes-relatorio" class="hidden pt-2 border-t border-slate-800 space-y-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="cursor-pointer border border-teal-500/60 bg-teal-500/10 rounded-xl p-2.5 flex items-start gap-2.5 transition" id="card-modo-exclusivo">
+              <input type="radio" name="modo-relatorio" value="exclusivo" checked onchange="alternarModoRelatorio(this.value)" class="mt-0.5 accent-teal-400">
+              <div>
+                <span class="block text-xs font-bold text-teal-300">Devolutiva Família / Supervisão (Detalhado)</span>
+                <span class="block text-[11px] text-slate-300">Explica o impacto funcional no brincar, autocuidado e rotina.</span>
+              </div>
+            </label>
+            <label class="cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-2.5 flex items-start gap-2.5 transition" id="card-modo-geral">
+              <input type="radio" name="modo-relatorio" value="geral" onchange="alternarModoRelatorio(this.value)" class="mt-0.5 accent-teal-400">
+              <div>
+                <span class="block text-xs font-bold text-slate-200">Equipe Multidisciplinar / Convênio (Sintético)</span>
+                <span class="block text-[11px] text-slate-400">Síntese técnica objetiva para prontuário compartilhado.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. SELEÇÃO DE PACIENTE -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="md:col-span-2">
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">Selecione o Paciente (<span id="total-pacientes-badge">46</span> cadastrados em A-Z) *</label>
@@ -126,20 +188,20 @@
         </div>
       </div>
 
-      <!-- Histórico de Evoluções Salvas do Paciente -->
+      <!-- Histórico de Registros Salvos do Paciente -->
       <div id="container-historico-relatorios" class="hidden bg-slate-900/70 border border-slate-700/60 rounded-xl p-4 space-y-3">
         <h3 class="text-xs font-bold text-teal-300 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-teal-400"></i> Evoluções Salvas deste Paciente (<span id="count-relatorios">0</span>)
+          <i class="fa-solid fa-clock-rotate-left text-teal-400"></i> Registros Salvos deste Paciente (<span id="count-relatorios">0</span>)
         </h3>
         <div id="lista-historico-relatorios" class="space-y-2 max-h-44 overflow-y-auto pr-1"></div>
       </div>
 
-      <!-- PLANO TERAPÊUTICO OFICIAL (ESPAÇO FLORESÇA - 7 SEÇÕES) -->
+      <!-- 3. PLANO TERAPÊUTICO OFICIAL (OBJETIVOS & ESTRATÉGIAS) -->
       <div class="bg-slate-900/80 border border-teal-500/40 rounded-2xl overflow-hidden">
         <div class="bg-slate-950/70 px-5 py-3.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-700/80">
           <div class="flex items-center gap-2.5">
             <span class="bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2.5 py-1 rounded-lg text-xs font-bold">
-              <i class="fa-solid fa-check-double mr-1"></i> PLANO TERAPÊUTICO (FICHA DA CLÍNICA)
+              <i class="fa-solid fa-check-double mr-1"></i> 2. OBJETIVOS & ESTRATÉGIAS (PLANO TERAPÊUTICO)
             </span>
             <span id="contador-itens-plano" class="text-xs text-slate-400">0 itens marcados</span>
           </div>
@@ -153,96 +215,131 @@
           </div>
         </div>
 
-        <div id="corpo-ficha-plano" class="p-5 space-y-5 max-h-[540px] overflow-y-auto">
+        <div id="corpo-ficha-plano" class="p-5 space-y-5 max-h-[480px] overflow-y-auto">
           <p class="text-xs text-slate-300 bg-teal-950/30 border border-teal-500/20 rounded-xl p-3">
             <i class="fa-solid fa-circle-info text-teal-400 mr-1"></i>
-            Marque abaixo os itens do <strong>Plano Terapêutico Terapia Ocupacional</strong> deste paciente (fica salvo automaticamente no cadastro dele). Ao gerar o relatório, o sistema cruza os itens marcados com as observações da sessão!
+            Conforme o <strong>Guia de Registro Clínico</strong>, cada estratégia marcada já é vinculada automaticamente ao respectivo objetivo terapêutico (Práxis, Integração Sensorial, AVDs, Coordenação, Funções Executivas, Seletividade Alimentar ou Socialização/Autorregulação).
           </p>
-
-          <!-- Container dinâmico das seções 2 a 7 do formulário oficial -->
           <div id="secoes-plano-container" class="space-y-4"></div>
         </div>
       </div>
 
-      <!-- SELETOR DE MODO DE RELATÓRIO -->
-      <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-4 space-y-3">
-        <label class="block text-xs font-bold text-teal-300 uppercase tracking-wider">
-          <i class="fa-solid fa-layer-group mr-1"></i> Perfil do Relatório de Evolução:
-        </label>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <label class="cursor-pointer border border-teal-500 bg-teal-500/10 rounded-xl p-3 flex items-start gap-3 transition" id="card-modo-exclusivo">
-            <input type="radio" name="modo-relatorio" value="exclusivo" checked onchange="alternarModoRelatorio(this.value)" class="mt-1 accent-teal-400">
-            <div>
-              <span class="block text-xs font-bold text-teal-300">Exclusivo TO / Devolutiva para Família (Detalhado)</span>
-              <span class="block text-[11px] text-slate-300 mt-0.5">Traduz cada intervenção do Plano Terapêutico em linguagem clara para família e supervisão, mostrando o impacto no brincar, rotina e autonomia.</span>
-            </div>
+      <!-- 4. RESPOSTA OBSERVADA E NÍVEL DE ASSISTÊNCIA POR ETAPA (REGRAS DO GUIA) -->
+      <div class="bg-slate-900/80 border border-slate-700 rounded-2xl p-5 space-y-4">
+        <div class="border-b border-slate-700 pb-2.5 flex flex-wrap justify-between items-center gap-2">
+          <h3 class="text-xs font-bold text-teal-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-hand-holding-heart text-teal-400"></i> 3. Resposta Observada & Nível de Assistência (Padrão Guia Clínico)
+          </h3>
+          <span class="text-[11px] text-slate-400">Descreve fatos observáveis sem julgamentos</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Engajamento -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Engajamento e Participação:</label>
+            <select id="engajamento-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
+              <option value="bom">Bom engajamento e participação espontânea</option>
+              <option value="parcial">Engajamento parcial, mantendo-se mediante incentivo</option>
+              <option value="recusa_inicial">Recusa/cautela inicial com posterior adesão após mediação</option>
+              <option value="oscilacao">Oscilação no engajamento, alternando entre propostas</option>
+              <option value="baixa_iniciativa">Baixa iniciativa, requerendo estruturação e mediação constante</option>
+            </select>
+          </div>
+
+          <!-- Nível de Assistência -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Nível de Assistência Oferecido:</label>
+            <select id="assistencia-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
+              <option value="independente">Independente (realizou com autonomia)</option>
+              <option value="supervisao">Supervisão e antecipação visual</option>
+              <option value="pista_verbal">Pistas verbais pontuais</option>
+              <option value="pista_verbal_visual">Pistas verbais e visuais/gestuais</option>
+              <option value="modelagem">Demonstração / modelagem e encadeamento por etapas</option>
+              <option value="apoio_fisico_parcial">Apoio físico parcial graduado</option>
+              <option value="redirecionamento">Redirecionamento frequente e mediação contínua</option>
+            </select>
+          </div>
+
+          <!-- Etapa da Tarefa em que precisou de suporte -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Em qual etapa houve necessidade de suporte?</label>
+            <select id="etapa-assistencia-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
+              <option value="todas_autonoma">Em todas as etapas (sem necessidade de auxílio)</option>
+              <option value="iniciar">Para iniciar a proposta e aceitar a demanda</option>
+              <option value="organizar">Para organizar e sequenciar as etapas da tarefa</option>
+              <option value="manter">Para manter a atenção e permanecer até a conclusão</option>
+              <option value="transicoes">Nas transições entre atividades e tolerância à frustração</option>
+              <option value="concluir">Para executar/concluir os ajustes motores finos ou finais</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos específicos para Relatório de Período -->
+        <div id="campos-exclusivos-relatorio" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Período de Referência do Relatório:</label>
+            <input type="text" id="periodo-input" placeholder="Ex: Agosto a Novembro de 2026" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Consistência & Desempenho (Conhecido vs. Novo):</label>
+            <select id="consistencia-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
+              <option value="familiar_melhor">Mais consistente em tarefas familiares; requer mediação em demandas novas</option>
+              <option value="generalizando">Desempenho regular com melhora progressiva na frequência e autonomia</option>
+              <option value="sensivel_ambiente">Varia conforme estímulos do ambiente e previsibilidade da rotina</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Observações Clínicas Fatuais -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div>
+            <label class="block text-xs font-semibold text-teal-300 mb-1.5">
+              Fatos observados diretamente em sala (Opcional):
+            </label>
+            <textarea id="observacao-sala-input" rows="3" placeholder="Ex: Realizou o percurso motor com equilíbrio dinâmico; necessitou de pista visual para aguardar a vez no jogo de regras e utilizou estratégia proprioceptiva para se reorganizar após frustração..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs leading-relaxed"></textarea>
+          </div>
+
+          <div>
+            <label id="label-campo-complementar" class="block text-xs font-semibold text-slate-300 mb-1.5">
+              Conduta / Ajustes para a próxima sessão (Opcional):
+            </label>
+            <textarea id="campo-complementar-input" rows="3" placeholder="Ex: Manter graduação de complexidade no planejamento motor e antecipação visual das transições..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <!-- Campo extra de Generalização / Relato de Terceiros (Aparece no modo Relatório) -->
+        <div id="box-relato-terceiros" class="hidden pt-1">
+          <label class="block text-xs font-semibold text-amber-300 mb-1.5">
+            <i class="fa-solid fa-house-user mr-1"></i> Generalização e Relato da Família / Escola (Opcional — diferenciado no texto conforme o guia):
           </label>
-          <label class="cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3 flex items-start gap-3 transition" id="card-modo-geral">
-            <input type="radio" name="modo-relatorio" value="geral" onchange="alternarModoRelatorio(this.value)" class="mt-1 accent-teal-400">
-            <div>
-              <span class="block text-xs font-bold text-slate-200">Equipe Multidisciplinar / Geral (Objetivo)</span>
-              <span class="block text-[11px] text-slate-400 mt-0.5">Síntese técnica objetiva para prontuário compartilhado com outras especialidades.</span>
-            </div>
-          </label>
+          <input type="text" id="relato-terceiros-input" placeholder="Ex: Segundo relato da mãe, passou a aceitar melhor o momento do banho e iniciar o vestir com menor resistência em casa..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:border-teal-500 outline-none text-xs">
         </div>
       </div>
 
-      <!-- Dados Complementares da Evolução -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Período / Referência da Evolução (Opcional):</label>
-          <input type="text" id="periodo-input" placeholder="Ex: 2º Semestre/2026 ou Novembro/2026" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Resposta Geral & Participação nas Sessões:</label>
-          <select id="comportamento-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
-            <option value="excelente">Boa evolução, participativo(a), atento(a) e colaborativo(a)</option>
-            <option value="moderado">Evolução gradual, necessitando de mediação verbal/visual pontual</option>
-            <option value="agitado">Oscilação de alerta/agitação, organizando-se bem após recursos sensoriais</option>
-            <option value="resistent">Cautela/resistência inicial, evoluindo após vinculação e adaptação gradual</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-teal-300 mb-1.5">
-            Como a criança respondeu na prática durante os atendimentos? (Complemento livre opcional)
-          </label>
-          <textarea id="estrategias-resposta-input" rows="3" placeholder="Ex: Aceitou bem o circuito e a piscina de bolinhas para se organizar antes da mesa; conseguiu manter contato visual, encaixar peças e esperar a vez com pouca mediação..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-slate-100 focus:border-teal-500 outline-none text-sm leading-relaxed"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">
-            O que ainda precisa ser fortalecido no dia a dia / próximos passos? (Opcional):
-          </label>
-          <input type="text" id="desafios-input" placeholder="Ex: Manter atenção sustentada com estímulos ao redor, ampliar autonomia nas AVDs, tolerância à frustração..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-100 focus:border-teal-500 outline-none text-xs">
-        </div>
-      </div>
-
-      <button onclick="gerarEvolucaoCompleta()" class="w-full py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-base">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório Técnico-Funcional Completo
+      <button onclick="gerarDocumentoClinico()" id="btn-gerar-principal" class="w-full py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-base">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Evolução de Prontuário (3 Pilares)
       </button>
     </div>
 
-    <!-- PREVIEW DO RELATÓRIO DE EVOLUÇÃO (ARIAL 12) -->
+    <!-- PREVIEW DO DOCUMENTO GERADO (ARIAL 12) -->
     <div id="relatorio-out" class="hidden bg-white text-black p-8 md:p-14 rounded-2xl shadow-2xl card-print documento-arial-12">
       
       <div class="text-center mb-6">
-        <h1 class="font-normal uppercase tracking-normal text-black" style="font-family: Arial, sans-serif; font-size: 12pt;">
-          RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
+        <h1 id="doc-titulo-principal" class="font-normal uppercase tracking-normal text-black" style="font-family: Arial, sans-serif; font-size: 12pt;">
+          EVOLUÇÃO DE PRONTUÁRIO — TERAPIA OCUPACIONAL
         </h1>
       </div>
 
       <div class="mb-6 text-black" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;" id="print-identificacao">
         <p><strong>Nome:</strong> <span id="doc-nome"></span></p>
         <p><strong>Data de nascimento:</strong> <span id="doc-dn"></span></p>
+        <p id="linha-data-sessao-doc" class="hidden"><strong>Data do atendimento:</strong> <span id="doc-data-sessao"></span></p>
       </div>
 
       <div>
-        <textarea id="rel-corpo-evolucao" rows="20" oninput="ajustarAlturaTextarea(this)" class="w-full text-black text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 outline-none no-print" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;"></textarea>
+        <textarea id="rel-corpo-evolucao" rows="16" oninput="ajustarAlturaTextarea(this)" class="w-full text-black text-justify border border-slate-200 focus:ring-1 focus:ring-teal-500 rounded p-2 outline-none no-print" style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;"></textarea>
         <div id="rel-corpo-print"></div>
-        <p class="text-[11px] text-slate-500 mt-1.5 no-print font-sans">* Clique no texto acima para ajustar qualquer detalhe antes de baixar no Word ou Imprimir.</p>
+        <p class="text-[11px] text-slate-500 mt-1.5 no-print font-sans">* Clique no texto acima para editar qualquer detalhe antes de copiar, baixar em Word ou imprimir.</p>
       </div>
 
       <div class="pt-12 text-center mt-8" style="font-family: Arial, sans-serif; font-size: 12pt;">
@@ -253,13 +350,13 @@
 
       <div class="flex flex-wrap justify-end gap-3 no-print pt-6 mt-6 border-t border-slate-200 font-sans">
         <button onclick="copiarTextoCompletoWord()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2">
-          <i class="fa-solid fa-copy"></i> Copiar Tudo
+          <i class="fa-solid fa-copy"></i> Copiar para Prontuário / Word
         </button>
         <button onclick="baixarArquivoWord()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
           <i class="fa-solid fa-file-word"></i> Baixar em Word (.doc - Arial 12)
         </button>
         <button onclick="imprimirRelatorio()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 shadow">
-          <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF Completo
+          <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
         </button>
       </div>
     </div>
@@ -367,12 +464,13 @@
       { id: 123, nome: 'Yuri Azuma', conv: 'SAVI', cid: 'F84.0', dn: '' }
     ];
 
-    // ESTRUTURA EXATA DO PLANO TERAPÊUTICO OFICIAL (ESPAÇO FLORESÇA - TERAPIA OCUPACIONAL)
+    // PLANO TERAPÊUTICO OFICIAL MAPEADO AOS OBJETIVOS DO GUIA CLÍNICO
     const estruturaPlanoTerapeutico = [
       {
         id: 'sec_avd',
-        titulo: '2 – Intervenções em AVD',
+        titulo: '2 – Intervenções em AVD e AIVD',
         obsLabel: 'Observações / Materiais utilizados:',
+        objetivoCurto: 'autonomia, sequenciamento e participação funcional nas Atividades de Vida Diária (AVDs) e AIVDs',
         demandaResumo: 'ampliação da independência funcional e organização nas Atividades de Vida Diária (AVDs)',
         itens: [
           'Treino de alimentação funcional',
@@ -389,50 +487,54 @@
       },
       {
         id: 'sec_vestibular',
-        titulo: '3 – Intervenções em Sistemas Sensoriais — Sistema Vestibular',
+        titulo: '3 – Sistemas Sensoriais — Sistema Vestibular',
         obsLabel: null,
+        objetivoCurto: 'modulação do processamento vestibular, equilíbrio dinâmico e controle postural',
         demandaResumo: 'modulação do processamento vestibular, equilíbrio dinâmico e controle postural',
         itens: [
-          'Estímulo vestibular linear (ex: balanço, rede, tábua de equilíbrio)',
+          'Estímulo vestibular linear (balanço, rede, tábua de equilíbrio)',
           'Estímulo vestibular axial (giro, rotação, scooter, prancha)',
           'Estímulo vestibular disritmado / variado',
           'Treino de coordenação bilateral através de estímulos vestibulares',
           'Atividades de equilíbrio dinâmico',
           'Transições posturais (decúbito, quatro apoios, bípede, ajoelhado)',
-          'Brincadeiras de movimento (ex: circuito motor, escorrega, pular)'
+          'Brincadeiras de movimento (circuito motor, escorrega, pular)'
         ]
       },
       {
         id: 'sec_proprioceptivo',
-        titulo: '3 – Intervenções em Sistemas Sensoriais — Sistema Proprioceptivo',
+        titulo: '3 – Sistemas Sensoriais — Sistema Proprioceptivo',
         obsLabel: null,
+        objetivoCurto: 'organização corporal, percepção proprioceptiva e modulação do nível de alerta',
         demandaResumo: 'organização corporal e autorregulação por meio de estímulos proprioceptivos',
         itens: [
           'Atividades de empurrar / puxar / carregar peso',
           'Atividades de resistência corporal',
           'Caminhar com carga / transporte de objetos',
           'Compressão articular (atividades pesadas seguras)',
-          'Jogos de força (ex: cabo de guerra, rolar bola pesada)',
+          'Jogos de força (cabo de guerra, rolar bola pesada)',
           'Uso de elásticos / theraband'
         ]
       },
       {
         id: 'sec_tatil',
-        titulo: '3 – Intervenções em Sistemas Sensoriais — Sistema Tátil',
+        titulo: '3 – Sistemas Sensoriais — Sistema Tátil',
         obsLabel: null,
+        objetivoCurto: 'acomodação, exploração e discriminação tátil',
         demandaResumo: 'acomodação, exploração e discriminação tátil',
         itens: [
-          'Caixa sensorial (areia, arroz, gel, espuma etc.)',
+          'Caixa sensorial (areia, arroz, gel, espuma)',
           'Atividades de exploração tátil com diferentes texturas',
-          'Atividades de discriminação tátil (adivinhar objetos, encontrar pares)',
-          'Tarefas de desenho tátil (na areia, espuma, etc.)',
+          'Atividades de discriminação tátil (identificar objetos, pares)',
+          'Tarefas de desenho tátil (na areia, espuma)',
           'Massagem profunda / escovação terapêutica (quando indicado)'
         ]
       },
       {
         id: 'sec_visual_auditivo',
-        titulo: '3 – Intervenções em Sistemas Sensoriais — Sistema Visual e Auditivo',
+        titulo: '3 – Sistemas Sensoriais — Sistema Visual e Auditivo',
         obsLabel: 'Observações / Estratégias de modulação:',
+        objetivoCurto: 'integração visomotora, atenção visual e modulação sensorial ambiental',
         demandaResumo: 'integração visomotora, atenção visual e modulação sensorial auditiva/visual',
         itens: [
           'Atividades de rastreamento visual (bolinhas, lanternas, jogos)',
@@ -446,12 +548,13 @@
         id: 'sec_praxias',
         titulo: '4 – Intervenções em Praxias e Coordenação',
         obsLabel: 'Observações / Materiais utilizados:',
-        demandaResumo: 'desenvolvimento da praxia (ideação, sequenciamento e planejamento motor) e coordenação bilateral',
+        objetivoCurto: 'práxis (ideação, planejamento motor e sequenciamento) e coordenação bilateral',
+        demandaResumo: 'desenvolvimento da práxis (ideação, sequenciamento e planejamento motor) e coordenação bilateral',
         itens: [
-          'Atividades para treino de praxis ideacional (planejar e sequenciar ações)',
+          'Atividades para treino de práxis ideacional (planejar e sequenciar ações)',
           'Atividades de imitação de gestos / movimentos',
-          'Treino de praxis construtiva (montar, empilhar, construir, sequenciar)',
-          'Jogos de sequência motora (ex: siga o mestre, imite o gesto)',
+          'Treino de práxis construtiva (montar, empilhar, construir, sequenciar)',
+          'Jogos de sequência motora (siga o mestre, imite o gesto)',
           'Treino de coordenação bilateral (movimentos alternados e simultâneos)',
           'Treino de ajuste postural durante movimento',
           'Atividades de ritmo e tempo (batida, coordenação alternada)',
@@ -460,9 +563,10 @@
       },
       {
         id: 'sec_escolares_fina',
-        titulo: '5 – Intervenções em Funções Escolares / Coordenação Motora Fina',
+        titulo: '5 – Funções Escolares / Coordenação Motora Fina / Funções Executivas',
         obsLabel: 'Observações / Progressos observados:',
-        demandaResumo: 'aprimoramento da coordenação motora fina, preensão funcional e habilidades pré-escolares/escolares',
+        objetivoCurto: 'coordenação motora fina, preensão funcional, atenção e organização de tarefas',
+        demandaResumo: 'aprimoramento da coordenação motora fina, preensão funcional e funções executivas',
         itens: [
           'Treino de preensão funcional (lápis, pinça, tesoura)',
           'Atividades de coordenação olho-mão (encaixe, recorte, colagem)',
@@ -471,15 +575,16 @@
           'Escrita / treino gráfico (letras, traços, formas)',
           'Modelagem (massinha, argila, bolinhas)',
           'Montagem de blocos, jogos de enroscar, pinçar objetos',
-          'Atividades de atenção e organização de material escolar',
-          'Jogos de mesa (encaixe, puzzle, sequência)'
+          'Atividades de atenção, planejamento e organização de material escolar',
+          'Jogos de mesa e cognitivos (encaixe, puzzle, memória, sequência)'
         ]
       },
       {
         id: 'sec_alimentar',
         titulo: '6 – Intervenções para Seletividade Alimentar',
         obsLabel: 'Observações / Alimentos utilizados:',
-        demandaResumo: 'dessensibilização sensorial oral e ampliação da aceitação alimentar',
+        objetivoCurto: 'exploração sensorial gradual e ampliação da tolerância alimentar',
+        demandaResumo: 'dessensibilização sensorial oral e ampliação do repertório alimentar',
         itens: [
           'Exposição gradual a novos alimentos',
           'Exploração sensorial com alimentos (tocar, cheirar, lamber, provar)',
@@ -493,18 +598,19 @@
       },
       {
         id: 'sec_socializacao',
-        titulo: '7 – Intervenções em Socialização e Regulação',
-        obsLabel: 'Observações / Comportamento durante sessão:',
+        titulo: '7 – Intervenções em Brincar, Socialização e Autorregulação',
+        obsLabel: 'Observações / Comportamento observado na sessão:',
+        objetivoCurto: 'brincar funcional/simbólico, atenção compartilhada, flexibilidade e autorregulação',
         demandaResumo: 'autorregulação emocional, atenção compartilhada, tolerância à frustração e interação social no brincar',
         itens: [
-          'Atividades de grupo / pares (jogos cooperativos, turnos)',
-          'Treino de atenção compartilhada',
+          'Atividades em dupla / grupo (jogos cooperativos, alternância de turnos)',
+          'Treino de atenção compartilhada e reciprocidade',
           'Atividades de imitação social (saudações, gestos, turnos)',
-          'Jogos simbólicos / faz de conta',
-          'Estratégias de autorregulação emocional',
-          'Uso de histórias sociais ou cartões visuais',
-          'Estratégias de rotina previsível e transição suave',
-          'Treino de tolerância a frustrações / limites'
+          'Brincar simbólico / faz de conta e ampliação do repertório lúdico',
+          'Estratégias de autorregulação emocional e reconhecimento de estados internos',
+          'Uso de histórias sociais ou cartões/rotina visual',
+          'Estratégias de rotina previsível e antecipação de transições',
+          'Treino de tolerância a frustrações, espera e regras'
         ]
       }
     ];
@@ -569,6 +675,52 @@
     let relatorioAtualEmEdicao = null;
     let acordeaoAberto = true;
 
+    function alternarTipoDocumento(tipo) {
+      const cardSessao = document.getElementById('card-tipo-sessao');
+      const cardRelatorio = document.getElementById('card-tipo-relatorio');
+      const subSessao = document.getElementById('subopcoes-sessao');
+      const subRelatorio = document.getElementById('subopcoes-relatorio');
+      const camposRel = document.getElementById('campos-exclusivos-relatorio');
+      const boxTerceiros = document.getElementById('box-relato-terceiros');
+      const labelComp = document.getElementById('label-campo-complementar');
+      const inputComp = document.getElementById('campo-complementar-input');
+      const btnPrincipal = document.getElementById('btn-gerar-principal');
+
+      if (tipo === 'sessao') {
+        cardSessao.className = 'cursor-pointer border border-teal-500 bg-teal-500/15 rounded-xl p-3.5 flex items-start gap-3 transition';
+        cardRelatorio.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3.5 flex items-start gap-3 transition';
+        subSessao.classList.remove('hidden');
+        subRelatorio.classList.add('hidden');
+        camposRel.classList.add('hidden');
+        boxTerceiros.classList.add('hidden');
+        labelComp.innerText = 'Conduta / Ajustes para a próxima sessão (Opcional):';
+        inputComp.placeholder = 'Ex: Manter graduação de complexidade no planejamento motor e antecipação visual das transições...';
+        btnPrincipal.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Evolução de Prontuário (3 Pilares)';
+      } else {
+        cardRelatorio.className = 'cursor-pointer border border-teal-500 bg-teal-500/15 rounded-xl p-3.5 flex items-start gap-3 transition';
+        cardSessao.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3.5 flex items-start gap-3 transition';
+        subSessao.classList.add('hidden');
+        subRelatorio.classList.remove('hidden');
+        camposRel.classList.remove('hidden');
+        boxTerceiros.classList.remove('hidden');
+        labelComp.innerText = 'Dificuldades persistentes & Próximos focos terapêuticos (Opcional):';
+        inputComp.placeholder = 'Ex: Manter foco atencional com estímulos concorrentes, tolerância à frustração e autonomia nas AVDs...';
+        btnPrincipal.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Relatório de Evolução do Período';
+      }
+    }
+
+    function alternarModoRelatorio(valor) {
+      const cardExclusivo = document.getElementById('card-modo-exclusivo');
+      const cardGeral = document.getElementById('card-modo-geral');
+      if (valor === 'exclusivo') {
+        cardExclusivo.className = 'cursor-pointer border border-teal-500/60 bg-teal-500/10 rounded-xl p-2.5 flex items-start gap-2.5 transition';
+        cardGeral.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-2.5 flex items-start gap-2.5 transition';
+      } else {
+        cardGeral.className = 'cursor-pointer border border-teal-500/60 bg-teal-500/10 rounded-xl p-2.5 flex items-start gap-2.5 transition';
+        cardExclusivo.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-2.5 flex items-start gap-2.5 transition';
+      }
+    }
+
     function renderizarFormularioPlano() {
       const container = document.getElementById('secoes-plano-container');
       container.innerHTML = estruturaPlanoTerapeutico.map(sec => `
@@ -577,7 +729,7 @@
             ${sec.titulo}
           </h4>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            ${sec.itens.map((item, idx) => `
+            ${sec.itens.map(item => `
               <label class="flex items-start gap-2.5 text-xs text-slate-300 hover:bg-slate-900/60 p-1.5 rounded-lg cursor-pointer transition">
                 <input type="checkbox" data-sec="${sec.id}" data-item="${item}" onchange="salvarPlanoDoPacienteAtual()" class="chk-plano mt-0.5 accent-teal-400 rounded">
                 <span>${item}</span>
@@ -686,51 +838,306 @@
       return arr.slice(0, -1).join(', ') + ' e ' + ult;
     }
 
-    function gerarParagrafoPorSecaoPlano(secId, itensMarcados, obsTexto, modo) {
+    // Constrói a frase precisa de Assistência + Etapa conforme o Guia
+    function construirFraseAssistencia(assistencia, etapa) {
+      const mapaSuporte = {
+        'independente': 'realizou as propostas de forma independente e com autonomia funcional',
+        'supervisao': 'realizou as atividades sob supervisão e antecipação visual',
+        'pista_verbal': 'necessitou de pistas verbais pontuais',
+        'pista_verbal_visual': 'necessitou de pistas verbais e pistas visuais/gestuais',
+        'modelagem': 'necessitou de demonstração/modelagem e encadeamento por etapas',
+        'apoio_fisico_parcial': 'necessitou de apoio físico parcial graduado',
+        'redirecionamento': 'necessitou de redirecionamento frequente e mediação terapêutica contínua'
+      };
+
+      const mapaEtapa = {
+        'todas_autonoma': '',
+        'iniciar': ' para iniciar a proposta e aceitar a demanda',
+        'organizar': ' para organizar e sequenciar as etapas da tarefa',
+        'manter': ' para manter o foco atencional e permanecer na atividade até a conclusão',
+        'transicoes': ' durante as transições entre propostas e na regulação diante de frustrações',
+        'concluir': ' para executar e concluir os ajustes motores finais'
+      };
+
+      if (assistencia === 'independente') {
+        return mapaSuporte['independente'];
+      }
+      if (assistencia === 'supervisao') {
+        return mapaSuporte['supervisao'] + (etapa !== 'todas_autonoma' ? mapaEtapa[etapa] : '');
+      }
+      return mapaSuporte[assistencia] + (etapa !== 'todas_autonoma' ? mapaEtapa[etapa] : ' durante a execução');
+    }
+
+    function construirFraseEngajamento(engajamento) {
+      const mapa = {
+        'bom': 'apresentou bom engajamento e participação espontânea nas propostas',
+        'parcial': 'apresentou engajamento parcial, mantendo-se envolvida na atividade mediante incentivo e mediação',
+        'recusa_inicial': 'apresentou cautela e recusa inicial diante da proposta, evoluindo para adesão gradual após acolhimento e adaptação da demanda',
+        'oscilacao': 'apresentou oscilação no engajamento, alternando entre propostas e respondendo aos redirecionamentos oferecidos',
+        'baixa_iniciativa': 'apresentou baixa iniciativa espontânea, respondendo progressivamente às mediações estruturadas'
+      };
+      return mapa[engajamento] || mapa['bom'];
+    }
+
+    // GERADOR 1: EVOLUÇÃO DE PRONTUÁRIO (SESSÃO PONTUAL — 3 PILARES)
+    function gerarTextoEvolucaoSessao(p, secoesAtivas, engajamento, assistencia, etapa, obsSala, condutaProx, formatoSessao) {
+      const primeiroNome = p.nome.split(' ')[0];
+
+      // Pilar 1: Objetivos
+      let objetivosTexto = '';
+      if (secoesAtivas.length > 0) {
+        const listaObj = formatarListaNatural(secoesAtivas.map(s => s.sec.objetivoCurto));
+        objetivosTexto = `Estimular ${listaObj}.`;
+      } else {
+        objetivosTexto = 'Favorecer a organização sensório-motora, o planejamento motor (práxis) e o engajamento funcional nas ocupações infantis.';
+      }
+
+      // Pilar 2: Estratégias / Procedimentos (sempre vinculando recurso + finalidade)
+      let estrategiasTexto = '';
+      if (secoesAtivas.length > 0) {
+        const partesEstrategia = secoesAtivas.map(s => {
+          const itensLower = s.itens.map(i => i.charAt(0).toLowerCase() + i.slice(1));
+          const recStr = itensLower.length > 0 ? formatarListaNatural(itensLower) : 'atividades terapêuticas estruturadas';
+          const obsStr = s.obs ? ` (${s.obs})` : '';
+          return `${recStr}${obsStr} para favorecer ${s.sec.objetivoCurto}`;
+        });
+        estrategiasTexto = `Realizadas propostas envolvendo ${partesEstrategia.join('; ')}, com graduação da complexidade e mediação terapêutica ajustada.`;
+      } else {
+        estrategiasTexto = 'Realizadas atividades lúdicas estruturadas e experiências sensório-motoras graduadas para favorecer o planejamento motor e a autorregulação.';
+      }
+
+      // Pilar 3: Resposta do Paciente (fatos observáveis + nível de assistência + etapa)
+      const fraseEng = construirFraseEngajamento(engajamento);
+      const fraseAss = construirFraseAssistencia(assistencia, etapa);
+      let respostaTexto = `Durante o atendimento, ${primeiroNome} ${fraseEng} e ${fraseAss}.`;
+
+      if (obsSala) {
+        const obsClean = obsSala.charAt(0).toUpperCase() + obsSala.slice(1).replace(/\.$/, '');
+        respostaTexto += ` Observou-se diretamente em sala: ${obsClean}.`;
+      }
+
+      if (condutaProx) {
+        const condClean = condutaProx.charAt(0).toLowerCase() + condutaProx.slice(1).replace(/\.$/, '');
+        respostaTexto += ` Como conduta para os próximos atendimentos, indica-se ${condClean}.`;
+      }
+
+      if (formatoSessao === 'estruturado') {
+        return `Objetivo: ${objetivosTexto}\n\nEstratégia/Procedimento: ${estrategiasTexto}\n\nResposta: ${respostaTexto}`;
+      } else {
+        return `Sessão de Terapia Ocupacional com objetivo de ${objetivosTexto.charAt(0).toLowerCase() + objetivosTexto.slice(1)} ${estrategiasTexto} ${respostaTexto}`;
+      }
+    }
+
+    // GERADOR 2: RELATÓRIO DE EVOLUÇÃO (SÍNTESE LONGITUDINAL DO PERÍODO)
+    function gerarParagrafoPorSecaoRelatorio(secId, itensMarcados, obsTexto, modo) {
       const listaLimpa = itensMarcados.map(i => i.charAt(0).toLowerCase() + i.slice(1));
       const atividadesTxt = formatarListaNatural(listaLimpa);
       const detalheObs = obsTexto ? ` (${obsTexto})` : '';
 
       const templatesExclusivo = {
-        'sec_avd': `No âmbito das Atividades de Vida Diária (AVDs), foram conduzidos treinos funcionais direcionados para ${atividadesTxt}${detalheObs}. Na prática, observou-se maior iniciativa, organização sequencial e redução gradual da necessidade de auxílio físico, refletindo em ganhos concretos de autonomia no autocuidado e na rotina diária.`,
-        'sec_vestibular': `Com foco na modulação do processamento vestibular e no fortalecimento do controle postural, utilizaram-se propostas dinâmicas envolvendo ${atividadesTxt}${detalheObs}. Como resposta funcional, a criança apresentou maior segurança gravitacional, estabilidade de tronco e melhor equilíbrio durante as brincadeiras de movimento e permanência nas tarefas.`,
-        'sec_proprioceptivo': `Para atender à demanda de organização corporal e regulação do nível de alerta por meio do sistema proprioceptivo, empregaram-se estratégias com ${atividadesTxt}${detalheObs}. Verificou-se melhor acomodação sensorial e redução da agitação motora, favorecendo que a criança se mantivesse mais organizada e disponível para as atividades dirigidas.`,
-        'sec_tatil': `No domínio do processamento tátil, conduziram-se vivências estruturadas envolvendo ${atividadesTxt}${detalheObs}. Observou-se melhora na tolerância, exploração e discriminação de diferentes estímulos táteis, reduzindo respostas defensivas e ampliando a participação nas brincadeiras manuais.`,
-        'sec_visual_auditivo': `Visando o aprimoramento da integração visomotora e da modulação sensorial visual e auditiva, trabalharam-se propostas com ${atividadesTxt}${detalheObs}. A criança demonstrou evolução no rastreamento visual, na atenção sustentada aos estímulos relevantes e maior organização diante dos estímulos do ambiente.`,
-        'sec_praxias': `Com objetivo de desenvolver a praxia e o planejamento motor aplicados ao brincar ativo, estruturaram-se atividades de ${atividadesTxt}${detalheObs}. Na prática, a criança avançou na capacidade de idealizar, sequenciar e executar movimentos coordenados com maior agilidade e autonomia.`,
-        'sec_escolares_fina': `No preparo para as demandas escolares e no refinamento da coordenação motora fina, realizaram-se treinos funcionais com ${atividadesTxt}${detalheObs}. Observou-se evolução na preensão funcional, na integração bimanual e na precisão dos movimentos distais durante o manuseio de materiais gráficos e construtivos.`,
-        'sec_alimentar': `No acompanhamento voltado à seletividade alimentar, aplicaram-se estratégias graduais envolvendo ${atividadesTxt}${detalheObs}. Verificou-se maior abertura sensorial para explorar diferentes texturas e apresentações alimentares em ambiente organizado e acolhedor.`,
-        'sec_socializacao': `No desenvolvimento da socialização e da autorregulação emocional, conduziram-se propostas lúdicas direcionadas para ${atividadesTxt}${detalheObs}. Na prática, observou-se ampliação da atenção compartilhada, maior respeito à alternância de turnos e melhor regulação comportamental diante de regras e transições.`
+        'sec_avd': `No âmbito das Atividades de Vida Diária (AVDs) e AIVDs, foram conduzidos treinos funcionais direcionados para ${atividadesTxt}${detalheObs}. Observou-se evolução na organização sequencial das etapas e maior participação ativa nas rotinas de autocuidado.`,
+        'sec_vestibular': `Com foco na modulação do processamento vestibular e no fortalecimento do controle postural, utilizaram-se propostas dinâmicas envolvendo ${atividadesTxt}${detalheObs}, favorecendo maior estabilidade postural e equilíbrio dinâmico durante o brincar.`,
+        'sec_proprioceptivo': `Para atender à demanda de organização corporal e regulação do nível de alerta por meio do sistema proprioceptivo, empregaram-se estratégias com ${atividadesTxt}${detalheObs}, promovendo melhor acomodação sensorial e disponibilidade para as tarefas dirigidas.`,
+        'sec_tatil': `No domínio do processamento tátil, conduziram-se vivências estruturadas envolvendo ${atividadesTxt}${detalheObs}, observando-se maior tolerância e discriminação diante de diferentes texturas.`,
+        'sec_visual_auditivo': `Visando o aprimoramento da integração visomotora e da modulação sensorial visual e auditiva, trabalharam-se propostas com ${atividadesTxt}${detalheObs}, favorecendo o rastreamento visual e a atenção seletiva.`,
+        'sec_praxias': `Com objetivo de desenvolver a práxis e o planejamento motor aplicados ao brincar ativo, estruturaram-se atividades de ${atividadesTxt}${detalheObs}, observando-se avanços na ideação, imitação e sequenciamento motor.`,
+        'sec_escolares_fina': `No preparo para as demandas escolares e no refinamento da coordenação motora fina e funções executivas, realizaram-se treinos funcionais com ${atividadesTxt}${detalheObs}, com ganho na preensão funcional e na coordenação olho-mão.`,
+        'sec_alimentar': `No acompanhamento voltado à seletividade alimentar, aplicaram-se estratégias graduais envolvendo ${atividadesTxt}${detalheObs}, promovendo dessensibilização tátil-oral e exploração gradual em ambiente estruturado.`,
+        'sec_socializacao': `No desenvolvimento do brincar, socialização e autorregulação emocional, conduziram-se propostas lúdicas direcionadas para ${atividadesTxt}${detalheObs}, observando-se ampliação da atenção compartilhada e da alternância de turnos.`
       };
 
       const templatesGeral = {
-        'sec_avd': `Nas Atividades de Vida Diária (AVDs), realizaram-se intervenções com ${atividadesTxt}${detalheObs}, evidenciando progresso na autonomia e organização práxica.`,
+        'sec_avd': `Nas AVDs e AIVDs, realizaram-se intervenções com ${atividadesTxt}${detalheObs}, evidenciando progresso na autonomia e organização sequencial.`,
         'sec_vestibular': `No sistema vestibular, empregaram-se recursos de ${atividadesTxt}${detalheObs}, promovendo maior estabilidade postural e equilíbrio dinâmico.`,
         'sec_proprioceptivo': `No sistema proprioceptivo, aplicaram-se atividades de ${atividadesTxt}${detalheObs}, favorecendo a modulação do nível de alerta e organização corporal.`,
         'sec_tatil': `No processamento tátil, conduziram-se propostas com ${atividadesTxt}${detalheObs}, com melhora na acomodação e discriminação tátil.`,
-        'sec_visual_auditivo': `Nos sistemas visual e auditivo, trabalharam-se estratégias de ${atividadesTxt}${detalheObs}, otimizando a coordenação visomotora e a atenção seletiva.`,
-        'sec_praxias': `Em praxias e coordenação motora, desenvolveram-se atividades de ${atividadesTxt}${detalheObs}, observando-se avanços na ideação e sequenciamento motor.`,
-        'sec_escolares_fina': `Nas habilidades escolares e motricidade fina, realizaram-se treinos de ${atividadesTxt}${detalheObs}, com ganho na destreza manual e controle visomotor.`,
+        'sec_visual_auditivo': `Nos sistemas visual e auditivo, trabalharam-se estratégias de ${atividadesTxt}${detalheObs}, otimizando a coordenação visomotora e atenção visual.`,
+        'sec_praxias': `Em práxis e coordenação motora, desenvolveram-se atividades de ${atividadesTxt}${detalheObs}, observando-se avanços na ideação e sequenciamento motor.`,
+        'sec_escolares_fina': `Nas habilidades escolares, funções executivas e motricidade fina, realizaram-se treinos de ${atividadesTxt}${detalheObs}, com ganho na destreza manual.`,
         'sec_alimentar': `Na abordagem da seletividade alimentar, utilizaram-se estratégias de ${atividadesTxt}${detalheObs}, apresentando evolução na dessensibilização oral.`,
-        'sec_socializacao': `Na socialização e regulação emocional, aplicaram-se intervenções de ${atividadesTxt}${detalheObs}, com melhora na atenção compartilhada e tolerância à frustração.`
+        'sec_socializacao': `No brincar, socialização e autorregulação, aplicaram-se intervenções de ${atividadesTxt}${detalheObs}, com melhora na atenção compartilhada e flexibilidade.`
       };
 
       return modo === 'exclusivo' ? templatesExclusivo[secId] : templatesGeral[secId];
     }
 
-    function alternarModoRelatorio(valor) {
-      const cardExclusivo = document.getElementById('card-modo-exclusivo');
-      const cardGeral = document.getElementById('card-modo-geral');
-      if (valor === 'exclusivo') {
-        cardExclusivo.className = 'cursor-pointer border border-teal-500 bg-teal-500/10 rounded-xl p-3 flex items-start gap-3 transition';
-        cardGeral.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3 flex items-start gap-3 transition';
+    function gerarTextoRelatorioPeriodo(p, secoesAtivas, engajamento, assistencia, etapa, periodo, consistencia, obsSala, desafiosProx, relatoTerceiros, modo) {
+      const primeiroNome = p.nome.split(' ')[0];
+      const refPeriodo = periodo ? `referente ao período de ${periodo}` : 'ao longo do período de acompanhamento';
+
+      // 1. Identificação e Demanda / Objetivos
+      const intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento em Terapia Ocupacional, apresentando percurso evolutivo ${refPeriodo}.`;
+
+      let paragrafoObjetivos = '';
+      if (secoesAtivas.length > 0) {
+        const demandasLista = formatarListaNatural(secoesAtivas.map(s => s.sec.demandaResumo));
+        paragrafoObjetivos = modo === 'exclusivo'
+          ? `De acordo com o Plano Terapêutico Ocupacional, os objetivos gerais e específicos trabalhados com ${primeiroNome} direcionaram-se à ${demandasLista}, visando ampliar sua participação e autonomia nas ocupações infantis.`
+          : `Conforme o Plano Terapêutico estabelecido, os objetivos terapêuticos concentraram-se na ${demandasLista}, buscando otimizar o desempenho ocupacional.`;
       } else {
-        cardGeral.className = 'cursor-pointer border border-teal-500 bg-teal-500/10 rounded-xl p-3 flex items-start gap-3 transition';
-        cardExclusivo.className = 'cursor-pointer border border-slate-700 bg-slate-900/60 rounded-xl p-3 flex items-start gap-3 transition';
+        paragrafoObjetivos = 'Os objetivos terapêuticos no período concentraram-se na organização sensório-motora, planejamento práxico, autorregulação e participação funcional no brincar e nas rotinas diárias.';
       }
+
+      // 2. Procedimentos e Estratégias vinculadas aos objetivos
+      const paragrafosProcedimentos = secoesAtivas.map(s => {
+        const itensParaTexto = s.itens.length > 0 ? s.itens : ['intervenções terapêuticas estruturadas'];
+        return gerarParagrafoPorSecaoRelatorio(s.sec.id, itensParaTexto, s.obs, modo);
+      });
+
+      if (paragrafosProcedimentos.length === 0) {
+        paragrafosProcedimentos.push('Foram utilizadas atividades sensório-motoras, circuitos motores graduados, jogos estruturados e mediação terapêutica com pistas verbais e visuais para favorecer a organização corporal e o engajamento funcional.');
+      }
+
+      // 3. Análise do Desempenho, Consistência e Nível de Suporte
+      const fraseEng = construirFraseEngajamento(engajamento);
+      const fraseAss = construirFraseAssistencia(assistencia, etapa);
+
+      const mapaConsistencia = {
+        'familiar_melhor': 'observa-se participação mais consistente e regular em atividades estruturadas e familiares, enquanto diante de demandas novas ou mudanças de rotina ainda requer antecipação e mediação terapêutica',
+        'generalizando': 'verifica-se aumento gradual na frequência e regularidade das respostas adaptativas, demonstrando maior capacidade de iniciar, manter e concluir as propostas com redução progressiva do suporte',
+        'sensivel_ambiente': 'nota-se que a consistência do desempenho varia conforme a previsibilidade da rotina e a quantidade de estímulos ambientais concorrentes, respondendo positivamente à organização do contexto e divisão das tarefas em etapas'
+      };
+
+      let paragrafoAnalise = `Na análise longitudinal do desempenho ocupacional, ${primeiroNome} ${fraseEng} e ${fraseAss}. Ao longo das sessões, ${mapaConsistencia[consistencia]}.`;
+
+      if (obsSala) {
+        const obsClean = obsSala.charAt(0).toUpperCase() + obsSala.slice(1).replace(/\.$/, '');
+        paragrafoAnalise += ` Em observação clínica direta em sala, destaca-se que: ${obsClean}.`;
+      }
+
+      // 4. Generalização / Relato de Terceiros (Diferenciado conforme regra explícita do Guia)
+      let paragrafoGeneralizacao = '';
+      if (relatoTerceiros) {
+        const relClean = relatoTerceiros.charAt(0).toLowerCase() + relatoTerceiros.slice(1).replace(/\.$/, '');
+        paragrafoGeneralizacao = `Quanto à generalização das habilidades para outros contextos, conforme relato da família/escola (informação de terceiros), ${relClean}.`;
+      }
+
+      // 5. Considerações, Necessidades Atuais e Continuidade
+      let paragrafoContinuidade = '';
+      if (desafiosProx) {
+        const desClean = desafiosProx.charAt(0).toLowerCase() + desafiosProx.slice(1).replace(/\.$/, '');
+        paragrafoContinuidade = `Como necessidades terapêuticas atuais e próximos focos de intervenção, sinaliza-se a importância de trabalhar ${desClean}. Recomenda-se a continuidade do acompanhamento em Terapia Ocupacional para consolidar a autonomia funcional e favorecer a generalização para os ambientes familiar e escolar.`;
+      } else {
+        paragrafoContinuidade = `Diante do percurso observado, recomenda-se a continuidade do acompanhamento em Terapia Ocupacional com manutenção da graduação das demandas e articulação junto à família e à escola para consolidar a consistência e a generalização das conquistas no cotidiano.`;
+      }
+
+      return [
+        intro,
+        paragrafoObjetivos,
+        ...paragrafosProcedimentos,
+        paragrafoAnalise,
+        paragrafoGeneralizacao,
+        paragrafoContinuidade
+      ].filter(b => b && b.trim().length > 0).join('\n\n');
+    }
+
+    function gerarDocumentoClinico() {
+      const pId = parseInt(document.getElementById('paciente-select').value);
+      if (!pId) return alert('Por favor, selecione um paciente!');
+
+      const tipoDoc = document.querySelector('input[name="tipo-documento"]:checked').value;
+      const engajamento = document.getElementById('engajamento-select').value;
+      const assistencia = document.getElementById('assistencia-select').value;
+      const etapa = document.getElementById('etapa-assistencia-select').value;
+      const obsSala = document.getElementById('observacao-sala-input').value.trim();
+      const campoComp = document.getElementById('campo-complementar-input').value.trim();
+
+      // Coletar itens marcados do Plano Terapêutico
+      const secoesAtivas = [];
+      estruturaPlanoTerapeutico.forEach(sec => {
+        const marcados = Array.from(document.querySelectorAll(`.chk-plano[data-sec="${sec.id}"]:checked`))
+          .map(cb => cb.getAttribute('data-item'));
+        const obsInp = document.querySelector(`[data-obs-sec="${sec.id}"]`);
+        const obsVal = obsInp ? obsInp.value.trim() : '';
+
+        if (marcados.length > 0 || obsVal) {
+          secoesAtivas.push({ sec, itens: marcados, obs: obsVal });
+        }
+      });
+
+      if (secoesAtivas.length === 0 && !obsSala) {
+        return alert('Marque pelo menos um item nos Objetivos & Estratégias (Plano Terapêutico) ou descreva os fatos observados em sala.');
+      }
+
+      const p = listaPacientes.find(x => x.id === pId);
+      const dnFormatada = formatarDataBR(p.dn);
+
+      let textoFinal = '';
+      let rotuloHistorico = '';
+      let dataAtendimentoBR = '';
+
+      if (tipoDoc === 'sessao') {
+        const formatoSessao = document.querySelector('input[name="formato-sessao"]:checked').value;
+        const dataSessaoRaw = document.getElementById('data-sessao-input').value;
+        dataAtendimentoBR = dataSessaoRaw ? formatarDataBR(dataSessaoRaw) : new Date().toLocaleDateString('pt-BR');
+        textoFinal = gerarTextoEvolucaoSessao(p, secoesAtivas, engajamento, assistencia, etapa, obsSala, campoComp, formatoSessao);
+        rotuloHistorico = `Evolução Sessão (${dataAtendimentoBR})`;
+      } else {
+        const modo = document.querySelector('input[name="modo-relatorio"]:checked').value;
+        const periodo = document.getElementById('periodo-input').value.trim();
+        const consistencia = document.getElementById('consistencia-select').value;
+        const relatoTerceiros = document.getElementById('relato-terceiros-input').value.trim();
+        textoFinal = gerarTextoRelatorioPeriodo(p, secoesAtivas, engajamento, assistencia, etapa, periodo, consistencia, obsSala, campoComp, relatoTerceiros, modo);
+        rotuloHistorico = `Relatório Período ${periodo ? '(' + periodo + ')' : ''}`;
+      }
+
+      const agora = new Date();
+      const dataHoraStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      const registroSalvo = {
+        tipoDoc: tipoDoc,
+        dataHora: dataHoraStr,
+        periodo: rotuloHistorico,
+        dataAtendimento: dataAtendimentoBR,
+        pacienteNome: p.nome,
+        dnFormatada: dnFormatada,
+        convenio: p.conv || 'PARTICULAR',
+        cid: p.cid || 'F84.0',
+        textoCompleto: textoFinal
+      };
+
+      if (!historicoEvolucoesSalvas[pId]) {
+        historicoEvolucoesSalvas[pId] = [];
+      }
+      historicoEvolucoesSalvas[pId].unshift(registroSalvo);
+      localStorage.setItem('gestaoTO_evolucoes_salvas', JSON.stringify(historicoEvolucoesSalvas));
+
+      relatorioAtualEmEdicao = { pacienteId: pId, index: 0 };
+      exibirRelatorioNaTela(registroSalvo);
+      carregarHistoricoRelatorios(pId);
+    }
+
+    function exibirRelatorioNaTela(reg) {
+      const tituloEl = document.getElementById('doc-titulo-principal');
+      const linhaDataSessao = document.getElementById('linha-data-sessao-doc');
+      const docDataSessao = document.getElementById('doc-data-sessao');
+
+      if (reg.tipoDoc === 'sessao') {
+        tituloEl.innerText = 'EVOLUÇÃO DE PRONTUÁRIO — TERAPIA OCUPACIONAL';
+        linhaDataSessao.classList.remove('hidden');
+        docDataSessao.innerText = reg.dataAtendimento || new Date().toLocaleDateString('pt-BR');
+      } else {
+        tituloEl.innerText = 'RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL';
+        linhaDataSessao.classList.add('hidden');
+      }
+
+      document.getElementById('doc-nome').innerText = reg.pacienteNome;
+      document.getElementById('doc-dn').innerText = reg.dnFormatada || '';
+
+      const areaTexto = document.getElementById('rel-corpo-evolucao');
+      areaTexto.value = reg.textoCompleto;
+      document.getElementById('rel-corpo-print').innerText = reg.textoCompleto;
+
+      document.getElementById('relatorio-out').classList.remove('hidden');
+      ajustarAlturaTextarea(areaTexto);
+      document.getElementById('relatorio-out').scrollIntoView({ behavior: 'smooth' });
     }
 
     function init() {
+      const hojeISO = new Date().toISOString().split('T')[0];
+      const inputDataSessao = document.getElementById('data-sessao-input');
+      if (inputDataSessao && !inputDataSessao.value) inputDataSessao.value = hojeISO;
+
       renderizarFormularioPlano();
       listaPacientes = carregarEMesclarPacientes();
       const select = document.getElementById('paciente-select');
@@ -817,7 +1224,7 @@
       const dn = document.getElementById('novo-pac-dn').value;
       const conv = document.getElementById('novo-pac-conv').value.trim() || 'PARTICULAR';
       const cid = document.getElementById('novo-pac-cid').value.trim() || 'F84.0';
-      if(!nome) return;
+      if (!nome) return;
 
       const novo = { id: Date.now(), nome, conv, cid, dn };
       listaPacientes.push(novo);
@@ -831,7 +1238,7 @@
 
     function atualizarInfoPaciente(val) {
       const containerHistorico = document.getElementById('container-historico-relatorios');
-      if(!val) {
+      if (!val) {
         document.getElementById('info-dn').innerText = '-';
         document.getElementById('info-cid').innerText = '-';
         atualizarBadgePlano(0);
@@ -840,7 +1247,7 @@
       }
       const pId = parseInt(val);
       const p = listaPacientes.find(x => x.id === pId);
-      if(p) {
+      if (p) {
         document.getElementById('info-dn').innerText = p.dn ? formatarDataBR(p.dn) : 'Não inf.';
         document.getElementById('info-cid').innerText = p.cid || 'F84.0';
         carregarPlanoDoPaciente(pId);
@@ -857,12 +1264,12 @@
       countSpan.innerText = relatoriosPaciente.length;
 
       if (relatoriosPaciente.length === 0) {
-        listaDiv.innerHTML = `<p class="text-xs text-slate-400 italic">Nenhuma evolução gerada para esta criança ainda.</p>`;
+        listaDiv.innerHTML = `<p class="text-xs text-slate-400 italic">Nenhum registro salvo para esta criança ainda.</p>`;
       } else {
         listaDiv.innerHTML = relatoriosPaciente.map((rel, index) => `
           <div class="bg-slate-900 border border-slate-700/80 p-3 rounded-xl flex justify-between items-center text-xs">
             <div>
-              <span class="font-bold text-teal-300">Evolução ${rel.periodo ? '(' + rel.periodo + ')' : ''}</span>
+              <span class="font-bold ${rel.tipoDoc === 'sessao' ? 'text-sky-300' : 'text-teal-300'}">${rel.periodo || 'Registro Clínico'}</span>
               <span class="text-slate-400 block text-[11px] mt-0.5">Gerado em: ${rel.dataHora}</span>
             </div>
             <div class="flex gap-2">
@@ -880,190 +1287,6 @@
       containerHistorico.classList.remove('hidden');
     }
 
-    function transformarDesafiosEmTextoTecnico(desafiosRaw, modo) {
-      if (!desafiosRaw) {
-        return modo === 'exclusivo'
-          ? 'Para os próximos atendimentos, o trabalho seguirá focado em consolidar essas conquistas dentro da sala de terapia e apoiar a família e a escola para que a criança transfira essa organização e autonomia para o dia a dia.'
-          : 'Mantém-se o acompanhamento contínuo para consolidação das habilidades adquiridas e generalização funcional.';
-      }
-
-      const dLower = desafiosRaw.toLowerCase();
-      let aspectosTecnicos = [];
-
-      if (/(escrita|lápis|lapis|cansa|fadiga|força|forca|traço|traco|recorte|tesoura|pinça|pinca)/.test(dLower)) {
-        aspectosTecnicos.push('fortalecer a resistência manual e a precisão dos movimentos finos nas atividades gráficas e escolares');
-      }
-      if (/(atenção|atencao|foco|distrai|dispersa|concentra|terminar|concluir|estímulo|estimulo)/.test(dLower)) {
-        aspectosTecnicos.push('sustentar o foco atencional por períodos maiores mesmo diante de estímulos concorrentes no ambiente');
-      }
-      if (/(vez|turno|esperar|frustra|birra|impulsiv|agitad|calma|emoç|emoc|raiva|chor)/.test(dLower)) {
-        aspectosTecnicos.push('ampliar a tolerância à frustração, o controle inibitório e a aceitação da alternância de turnos sem desorganização emocional');
-      }
-      if (/(toque|textura|seletiv|comida|aliment|barulho|som|sensorial|medo|insegur)/.test(dLower)) {
-        aspectosTecnicos.push('promover dessensibilização gradual e maior segurança sensorial frente a novos estímulos');
-      }
-      if (/(equilíbrio|equilibrio|postura|cair|coordenação|coordenacao|pular|circuito|movimento|planej)/.test(dLower)) {
-        aspectosTecnicos.push('refinar o planejamento motor (praxia) e a estabilidade postural em desafios motores mais complexos');
-      }
-      if (/(autonomia|vestir|banheiro|roupa|talher|independência|independencia|avd|casa|rotina)/.test(dLower)) {
-        aspectosTecnicos.push('ampliar a independência prática nas rotinas de autocuidado e Atividades de Vida Diária (AVDs) junto à família');
-      }
-
-      if (aspectosTecnicos.length > 0) {
-        return `Como próximos objetivos terapêuticos para o dia a dia da criança, destaca-se a necessidade de continuar trabalhando para: ${aspectosTecnicos.join('; ')}.`;
-      } else {
-        return 'Como próximos passos do acompanhamento, busca-se fortalecer a autorregulação comportamental, o planejamento motor e a independência funcional diante de demandas cotidianas de maior complexidade.';
-      }
-    }
-
-    function gerarEvolucaoCompleta() {
-      const pId = parseInt(document.getElementById('paciente-select').value);
-      const estrategiasResposta = document.getElementById('estrategias-resposta-input').value.trim();
-      const comportamento = document.getElementById('comportamento-select').value;
-      const desafios = document.getElementById('desafios-input').value.trim();
-      const periodo = document.getElementById('periodo-input').value.trim();
-      const modo = document.querySelector('input[name="modo-relatorio"]:checked').value;
-
-      if(!pId) return alert('Por favor, selecione um paciente!');
-
-      // Coletar itens marcados do Plano Terapêutico
-      const secoesAtivas = [];
-      estruturaPlanoTerapeutico.forEach(sec => {
-        const marcados = Array.from(document.querySelectorAll(`.chk-plano[data-sec="${sec.id}"]:checked`))
-          .map(cb => cb.getAttribute('data-item'));
-        const obsInp = document.querySelector(`[data-obs-sec="${sec.id}"]`);
-        const obsVal = obsInp ? obsInp.value.trim() : '';
-
-        if (marcados.length > 0 || obsVal) {
-          secoesAtivas.push({
-            sec: sec,
-            itens: marcados,
-            obs: obsVal
-          });
-        }
-      });
-
-      if (secoesAtivas.length === 0 && !estrategiasResposta) {
-        return alert('Marque pelo menos um item no Plano Terapêutico acima ou descreva como a criança respondeu nos atendimentos.');
-      }
-
-      const p = listaPacientes.find(x => x.id === pId);
-      const primeiroNome = p.nome.split(' ')[0];
-      const dnFormatada = formatarDataBR(p.dn);
-
-      let refPeriodo = periodo ? `referente ao período de ${periodo}` : 'ao longo dos atendimentos realizados';
-      let intro = `O(A) paciente ${p.nome} encontra-se em acompanhamento em Terapia Ocupacional, apresentando evolução clínica e funcional consistente ${refPeriodo}.`;
-
-      // Parágrafo de Demandas do Plano Terapêutico
-      let paragrafoDemanda = '';
-      if (secoesAtivas.length > 0) {
-        const demandasLista = formatarListaNatural(secoesAtivas.map(s => s.sec.demandaResumo));
-        paragrafoDemanda = modo === 'exclusivo'
-          ? `De acordo com seu Plano Terapêutico Ocupacional, as intervenções com ${primeiroNome} têm como foco principal trabalhar demandas voltadas à ${demandasLista}, buscando favorecer sua participação ativa, autonomia e funcionalidade no brincar e nas atividades cotidianas.`
-          : `Conforme o Plano Terapêutico estabelecido, o acompanhamento está direcionado às demandas de ${demandasLista}, visando otimizar o desempenho ocupacional da criança.`;
-      } else {
-        paragrafoDemanda = modo === 'exclusivo'
-          ? `As intervenções em Terapia Ocupacional com ${primeiroNome} têm como objetivo promover a organização sensório-motora, o engajamento no brincar funcional e a autonomia nas atividades do dia a dia.`
-          : `O plano terapêutico ocupacional está direcionado à organização sensório-motora, planejamento práxico e funcionalidade nas ocupações infantis.`;
-      }
-
-      // Parágrafos técnicos de cada domínio marcado no Plano Terapêutico
-      let paragrafosDominios = secoesAtivas.map(s => {
-        const itensParaTexto = s.itens.length > 0 ? s.itens : ['intervenções terapêuticas estruturadas'];
-        return gerarParagrafoPorSecaoPlano(s.sec.id, itensParaTexto, s.obs, modo);
-      });
-
-      if (paragrafosDominios.length === 0) {
-        paragrafosDominios.push(
-          modo === 'exclusivo'
-            ? 'Durante as sessões, utilizaram-se atividades lúdicas estruturadas, graduação de desafios motores e recursos sensoriais ajustados ao perfil da criança para favorecer sua organização corporal e engajamento. Na prática, observou-se resposta positiva com maior permanência nas atividades propostas e avanços na autonomia durante o brincar.'
-            : 'Mediante atividades terapêuticas ocupacionais estruturadas e graduação de demandas sensório-motoras, verificou-se resposta adaptativa favorável e melhora no desempenho funcional.'
-        );
-      }
-
-      // Se o terapeuta escreveu observação prática adicional
-      let paragrafoObservacaoPratica = '';
-      if (estrategiasResposta) {
-        const limpo = estrategiasResposta.charAt(0).toLowerCase() + estrategiasResposta.slice(1).replace(/\.$/, '');
-        paragrafoObservacaoPratica = modo === 'exclusivo'
-          ? `Na dinâmica prática dos atendimentos, observou-se ainda que ${primeiroNome} ${limpo}, demonstrando evolução progressiva na resposta às mediações propostas.`
-          : `Complementarmente, observou-se durante as sessões que ${primeiroNome} ${limpo}.`;
-      }
-
-      // Perfil de participação
-      let mapaComportamentoExclusivo = {
-        'excelente': `No dia a dia dos atendimentos, ${primeiroNome} mostrou-se participativo(a), receptivo(a) às propostas e com bom vínculo terapêutico, conseguindo se envolver ativamente nas brincadeiras e responder bem às orientações.`,
-        'moderado': `Quanto à forma de participação, ${primeiroNome} apresentou evolução gradual, necessitando ainda de mediação verbal e pistas visuais ou físicas pontuais do terapeuta para iniciar e sustentar o foco até o final das atividades.`,
-        'agitado': `Em relação ao nível de energia e agitação, observaram-se momentos de maior movimentação e busca sensorial, nos quais o uso de estratégias proprioceptivas e estruturadas ajudou ${primeiroNome} a se reorganizar e retomar as atividades com mais calma.`,
-        'resistent': `Inicialmente, ${primeiroNome} demonstrou cautela e resistência diante de propostas novas, evoluindo gradualmente para maior segurança, confiança no vínculo e aceitação das atividades após adaptação do ambiente e respeito ao seu tempo de resposta.`
-      };
-
-      let mapaComportamentoGeral = {
-        'excelente': `Quanto ao engajamento, ${primeiroNome} manteve participação ativa, colaborativa e boa regulação comportamental durante as sessões.`,
-        'moderado': `Em relação à participação, ${primeiroNome} evoluiu gradualmente, respondendo satisfatoriamente mediante mediação verbal e pistas visuais pontuais.`,
-        'agitado': `Observou-se oscilação no nível de alerta, com boa resposta de autorregulação após aplicação de estratégias sensoriais organizadoras.`,
-        'resistent': `Após cautela inicial frente a novos estímulos, ${primeiroNome} apresentou vinculação positiva e aceitação progressiva das demandas propostas.`
-      };
-
-      let paragrafoComportamento = modo === 'exclusivo'
-        ? mapaComportamentoExclusivo[comportamento]
-        : mapaComportamentoGeral[comportamento];
-
-      let textoDesafios = transformarDesafiosEmTextoTecnico(desafios, modo);
-
-      let conclusao = modo === 'exclusivo'
-        ? `Diante dos avanços observados, indica-se a continuidade do acompanhamento em Terapia Ocupacional para consolidar essas habilidades no brincar, fortalecer a autonomia nas rotinas diárias e apoiar a família e a escola na generalização dessas conquistas.`
-        : `Diante da evolução apresentada, recomenda-se a continuidade do acompanhamento em Terapia Ocupacional visando potencializar a autonomia funcional e a generalização das conquistas para os ambientes familiar e escolar.`;
-
-      const blocos = [
-        intro,
-        paragrafoDemanda,
-        ...paragrafosDominios,
-        paragrafoObservacaoPratica,
-        paragrafoComportamento,
-        textoDesafios,
-        conclusao
-      ].filter(b => b && b.trim().length > 0);
-
-      const textoFinalEvolucao = blocos.join('\n\n');
-
-      const agora = new Date();
-      const dataHoraStr = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-      const registroEvolucao = {
-        dataHora: dataHoraStr,
-        periodo: periodo,
-        pacienteNome: p.nome,
-        dnFormatada: dnFormatada,
-        convenio: p.conv || 'SAVI',
-        cid: p.cid || 'F84.0',
-        textoCompleto: textoFinalEvolucao
-      };
-
-      if (!historicoEvolucoesSalvas[pId]) {
-        historicoEvolucoesSalvas[pId] = [];
-      }
-      historicoEvolucoesSalvas[pId].unshift(registroEvolucao);
-      localStorage.setItem('gestaoTO_evolucoes_salvas', JSON.stringify(historicoEvolucoesSalvas));
-
-      relatorioAtualEmEdicao = { pacienteId: pId, index: 0 };
-      exibirRelatorioNaTela(registroEvolucao);
-      carregarHistoricoRelatorios(pId);
-    }
-
-    function exibirRelatorioNaTela(reg) {
-      document.getElementById('doc-nome').innerText = reg.pacienteNome;
-      document.getElementById('doc-dn').innerText = reg.dnFormatada || '';
-
-      const areaTexto = document.getElementById('rel-corpo-evolucao');
-      areaTexto.value = reg.textoCompleto;
-      document.getElementById('rel-corpo-print').innerText = reg.textoCompleto;
-
-      document.getElementById('relatorio-out').classList.remove('hidden');
-      ajustarAlturaTextarea(areaTexto);
-      document.getElementById('relatorio-out').scrollIntoView({ behavior: 'smooth' });
-    }
-
     function visualizarRelatorioSalvo(pacienteId, index) {
       const reg = historicoEvolucoesSalvas[pacienteId][index];
       if (reg) {
@@ -1073,7 +1296,7 @@
     }
 
     function excluirRelatorioSalvo(pacienteId, index) {
-      if (confirm('Deseja realmente excluir esta evolução do histórico?')) {
+      if (confirm('Deseja realmente excluir este registro do histórico?')) {
         historicoEvolucoesSalvas[pacienteId].splice(index, 1);
         localStorage.setItem('gestaoTO_evolucoes_salvas', JSON.stringify(historicoEvolucoesSalvas));
         relatorioAtualEmEdicao = null;
@@ -1082,8 +1305,11 @@
     }
 
     function baixarArquivoWord() {
+      const titulo = document.getElementById('doc-titulo-principal').innerText;
       const nome = document.getElementById('doc-nome').innerText;
       const dn = document.getElementById('doc-dn').innerText;
+      const linhaSessaoVisivel = !document.getElementById('linha-data-sessao-doc').classList.contains('hidden');
+      const dataSessao = document.getElementById('doc-data-sessao').innerText;
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
       const paragrafosHTML = texto
@@ -1091,11 +1317,15 @@
         .map(p => `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; margin-top: 0; margin-bottom: 12pt; color: #000000;">${p.trim().replace(/\n/g, '<br>')}</p>`)
         .join('');
 
+      const blocoDataSessao = linhaSessaoVisivel
+        ? `<p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 18pt; color: #000000;"><strong>Data do atendimento:</strong> ${dataSessao}</p>`
+        : `<div style="margin-bottom: 18pt;"></div>`;
+
       const htmlWord = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
           <meta charset="utf-8">
-          <title>Relatório de Evolução - ${nome}</title>
+          <title>${titulo} - ${nome}</title>
           <style>
             @page {
               size: A4 portrait;
@@ -1111,15 +1341,16 @@
         </head>
         <body>
           <p style="font-family: Arial, sans-serif; font-size: 12pt; text-align: center; margin-bottom: 24pt; color: #000000;">
-            RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL
+            ${titulo}
           </p>
 
           <p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 0; color: #000000;">
             <strong>Nome:</strong> ${nome}
           </p>
-          <p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 18pt; color: #000000;">
+          <p style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; margin-top: 0; margin-bottom: 0; color: #000000;">
             <strong>Data de nascimento:</strong> ${dn}
           </p>
+          ${blocoDataSessao}
 
           ${paragrafosHTML}
 
@@ -1137,8 +1368,9 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const nomeLimpo = nome.replace(/[^a-zA-Z0-9À-ÿ\s]/g, '').trim().replace(/\s+/g, '_');
+      const prefixo = linhaSessaoVisivel ? 'Evolucao_Sessao' : 'Relatorio_Evolucao';
       a.href = url;
-      a.download = `Relatorio_Evolucao_${nomeLimpo}.doc`;
+      a.download = `${prefixo}_${nomeLimpo}.doc`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1146,14 +1378,18 @@
     }
 
     function copiarTextoCompletoWord() {
+      const titulo = document.getElementById('doc-titulo-principal').innerText;
       const nome = document.getElementById('doc-nome').innerText;
       const dn = document.getElementById('doc-dn').innerText;
+      const linhaSessaoVisivel = !document.getElementById('linha-data-sessao-doc').classList.contains('hidden');
+      const dataSessao = document.getElementById('doc-data-sessao').innerText;
       const texto = document.getElementById('rel-corpo-evolucao').value;
 
-      const completo = `RELATÓRIO DE EVOLUÇÃO — TERAPIA OCUPACIONAL\n\nNome: ${nome}\nData de nascimento: ${dn}\n\n${texto}\n\n__________________________________________\nAngelo José Alves\nTerapeuta Ocupacional`;
+      const cabecalhoSessao = linhaSessaoVisivel ? `\nData do atendimento: ${dataSessao}` : '';
+      const completo = `${titulo}\n\nNome: ${nome}\nData de nascimento: ${dn}${cabecalhoSessao}\n\n${texto}\n\n__________________________________________\nAngelo José Alves\nTerapeuta Ocupacional`;
 
       navigator.clipboard.writeText(completo).then(() => {
-        alert('Relatório técnico completo copiado! Basta colar no Word.');
+        alert('Registro clínico copiado com sucesso!');
       }).catch(() => {
         const textarea = document.getElementById('rel-corpo-evolucao');
         textarea.select();
