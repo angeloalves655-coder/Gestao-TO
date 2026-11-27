@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GestãoTO Pro v17 - Prontuário & Relatório Clínico TO</title>
+  <title>GestãoTO Pro v18 - Prontuário & Relatório Clínico TO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -73,8 +73,8 @@
           <i class="fa-solid fa-notes-medical"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">v17 • REDAÇÃO CLÍNICA INTELIGENTE</span></h1>
-          <p class="text-xs text-slate-400">Interpretação Técnica das Observações do Plano + 3 Modos de Relatório + Evolução 3 Pilares</p>
+          <h1 class="text-xl font-bold text-teal-400">GestãoTO <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">v18 • RELATÓRIO RESUMIDO ENXUTO</span></h1>
+          <p class="text-xs text-slate-400">Interpretação Técnica das Observações do Plano + Relatório Resumido Padrão Clínica + Evolução 3 Pilares</p>
         </div>
       </div>
       <div class="flex flex-wrap gap-2">
@@ -173,7 +173,7 @@
               <input type="radio" name="modo-relatorio" value="resumido" onchange="alternarModoRelatorio(this.value)" class="mt-0.5 accent-teal-400">
               <div>
                 <span class="block text-xs font-bold text-amber-300">Relatório Resumido (Enxuto — Parágrafo Único)</span>
-                <span class="block text-[11px] text-slate-300">Síntese compacta de 1 página reunindo Objetivos, Estratégias, Desempenho e Continuidade.</span>
+                <span class="block text-[11px] text-slate-300">Síntese compacta e direta (padrão clínico enxuto de 1 parágrafo).</span>
               </div>
             </label>
           </div>
@@ -226,7 +226,7 @@
         <div id="corpo-ficha-plano" class="p-5 space-y-5 max-h-[540px] overflow-y-auto">
           <div class="text-xs text-slate-300 bg-teal-950/30 border border-teal-500/20 rounded-xl p-3 space-y-1">
             <p><i class="fa-solid fa-wand-magic-sparkles text-teal-400 mr-1"></i> <strong>Redação Clínica Inteligente nas Observações:</strong></p>
-            <p class="text-[11px] text-slate-300">Você pode escrever livremente nas observações de cada área <strong>o que foi trabalhado</strong>, <strong>como foi mediado</strong> e <strong>como a criança realizou</strong> (ex: <em>"fez circuito com túnel e almofada, precisou de ajuda verbal para iniciar mas depois fez sozinho com equilíbrio"</em>). O sistema separa automaticamente o que é <strong>estratégia</strong> do que é <strong>desempenho/resposta da criança</strong>, ajusta os termos técnicos da Terapia Ocupacional e encaixa cada parte no parágrafo certo do relatório!</p>
+            <p class="text-[11px] text-slate-300">Escreva nas observações de cada área <strong>o que foi trabalhado</strong>, <strong>como foi mediado</strong> e <strong>como a criança realizou</strong>. O sistema separa automaticamente o que é <strong>estratégia</strong> do que é <strong>desempenho/resposta da criança</strong>, ajusta os termos técnicos da Terapia Ocupacional e encaixa cada parte no lugar certo do relatório!</p>
           </div>
           <div id="secoes-plano-container" class="space-y-4"></div>
         </div>
@@ -419,7 +419,7 @@
   </div>
 
   <script>
-    // BASE COMPLETA COM OS 46 PACIENTES (INCLUINDO THÉO JOSÉ, LUCAS PARDINHO, TEODORO RAGAZZI, SOPHIA BASSANI, PEDRO BRAGA E RAFAELA SALVATO)
+    // BASE COMPLETA COM OS 46 PACIENTES EM ORDEM ALFABÉTICA
     const pacientesBaseOficial = [
       { id: 201, nome: 'Bernardo Gabriel da Silva', conv: 'PARTICULAR', cid: 'F84.0', dn: '' },
       { id: 102, nome: 'Bernardo Marinho Mota', conv: 'SAVI', cid: 'F84.0', dn: '' },
@@ -475,7 +475,7 @@
         id: 'sec_avd',
         titulo: '2 – Intervenções em AVD e AIVD',
         obsLabel: 'O que foi trabalhado, como foi mediado e como a criança realizou (AVDs):',
-        objetivoCurto: 'autonomia nas Atividades de Vida Diária (AVDs) e AIVDs',
+        objetivoCurto: 'autonomia nas Atividades de Vida Diária (AVDs)',
         demandaResumo: 'ampliação da independência funcional e organização nas Atividades de Vida Diária (AVDs)',
         itens: [
           'Treino de alimentação funcional',
@@ -494,7 +494,7 @@
         id: 'sec_vestibular',
         titulo: '3 – Sistemas Sensoriais — Sistema Vestibular',
         obsLabel: 'O que foi trabalhado, como foi mediado e como a criança realizou (Vestibular):',
-        objetivoCurto: 'modulação vestibular, equilíbrio dinâmico e controle postural',
+        objetivoCurto: 'modulação vestibular e controle postural',
         demandaResumo: 'modulação do processamento vestibular, equilíbrio dinâmico e controle postural',
         itens: [
           'Estímulo vestibular linear (balanço, rede, tábua de equilíbrio)',
@@ -570,7 +570,7 @@
         id: 'sec_escolares_fina',
         titulo: '5 – Funções Escolares / Coordenação Motora Fina / Funções Executivas',
         obsLabel: 'O que foi trabalhado, como foi mediado e como a criança realizou (Fina/Executivas):',
-        objetivoCurto: 'coordenação motora fina, preensão funcional e funções executivas',
+        objetivoCurto: 'coordenação motora fina e funções executivas',
         demandaResumo: 'aprimoramento da coordenação motora fina, preensão funcional e funções executivas',
         itens: [
           'Treino de preensão funcional (lápis, pinça, tesoura)',
@@ -588,7 +588,7 @@
         id: 'sec_alimentar',
         titulo: '6 – Intervenções para Seletividade Alimentar',
         obsLabel: 'O que foi trabalhado, como foi mediado e como a criança realizou (Alimentação):',
-        objetivoCurto: 'exploração sensorial gradual e aceitação alimentar',
+        objetivoCurto: 'exploração sensorial e aceitação alimentar',
         demandaResumo: 'dessensibilização sensorial oral e ampliação do repertório alimentar',
         itens: [
           'Exposição gradual a novos alimentos',
@@ -605,7 +605,7 @@
         id: 'sec_socializacao',
         titulo: '7 – Intervenções em Brincar, Socialização e Autorregulação',
         obsLabel: 'O que foi trabalhado, como foi mediado e como a criança realizou (Brincar/Socialização):',
-        objetivoCurto: 'habilidades sociais no brincar, atenção compartilhada e autorregulação',
+        objetivoCurto: 'habilidades sociais no brincar e autorregulação',
         demandaResumo: 'autorregulação emocional, atenção compartilhada, tolerância à frustração e interação social no brincar',
         itens: [
           'Atividades em dupla / grupo (jogos cooperativos, alternância de turnos)',
@@ -627,7 +627,6 @@
       if (!textoBruto) return '';
       let t = textoBruto.trim();
 
-      // Dicionário de adequação terminológica (coloquial -> técnico TO / Guia Clínico)
       const substituicoesTecnicas = [
         [/\bsozinho(a)?\b/gi, 'de forma independente'],
         [/\bsem ajuda\b/gi, 'com independência funcional'],
@@ -639,13 +638,13 @@
         [/\bajuda f[ií]sica\b/gi, 'apoio físico graduado'],
         [/\bpegando na m[aã]o\b/gi, 'com apoio físico parcial guiado'],
         [/\bmostrando como faz\b/gi, 'por meio de demonstração e modelagem'],
-        [/\bfez junto\b/gi, 'executou mediante mediação e encadeamento'],
+        [/\bfez junto\b/gi, 'executou mediante mediação'],
         [/\bn[aã]o quis fazer\b/gi, 'apresentou recusa inicial diante da demanda'],
         [/\bn[aã]o queria\b/gi, 'demonstrou resistência inicial'],
         [/\bficou agitado(a)?\b/gi, 'apresentou elevação do nível de alerta e agitação psicomotora'],
         [/\bse acalmou\b/gi, 'alcançou organização corporal e autorregulação'],
         [/\bficou bravo(a)?\b/gi, 'demonstrou baixa tolerância à frustração'],
-        [/\bchorou\b/gi, 'apresentou desorganização emocional diante da demanda'],
+        [/\bchorou\b/gi, 'apresentou desorganização emocional'],
         [/\bse distraiu\b/gi, 'apresentou oscilação no foco atencional'],
         [/\bperdeu o foco\b/gi, 'apresentou dispersão atencional'],
         [/\bpregui[çc]a\b/gi, 'baixa iniciativa motora'],
@@ -654,8 +653,8 @@
         [/\bcaiu muito\b/gi, 'apresentou instabilidade postural'],
         [/\bse equilibrou bem\b/gi, 'manteve adequado controle postural e equilíbrio dinâmico'],
         [/\bpegou o l[aá]pis direito\b/gi, 'utilizou preensão funcional'],
-        [/\bpegou errado\b/gi, 'apresentou preensão imatura, necessitando de ajuste postural da mão'],
-        [/\bbrincou junto\b/gi, 'participou de forma compartilhada e recíproca'],
+        [/\bpegou errado\b/gi, 'apresentou preensão imatura, necessitando de ajuste'],
+        [/\bbrincou junto\b/gi, 'participou de forma compartilhada'],
         [/\besperou a vez\b/gi, 'respeitou a alternância de turnos'],
         [/\bcomeu\b/gi, 'aceitou a ingestão do alimento'],
         [/\bcheirou\b/gi, 'realizou exploração olfativa'],
@@ -670,20 +669,15 @@
         t = t.replace(regex, substituto);
       });
 
-      // Remove sujeito repetitivo no início se houver ("ele ", "ela ", "a criança ")
       t = t.replace(/^(ele|ela|a crian[çc]a|o paciente|a paciente)\s+/i, '');
       return t.replace(/\.+$/, '').trim();
     }
 
-    // Classifica cada oração escrita pelo terapeuta em:
-    // - estrategia: o que foi trabalhado e como foi conduzido/mediado
-    // - resposta: como a criança fez, reagiu, aceitou, executou ou quais dificuldades apresentou
     function analisarObservacaoSecao(obsBruta) {
       if (!obsBruta || !obsBruta.trim()) {
         return { estrategias: [], respostas: [] };
       }
 
-      // Quebra por ponto final, ponto e vírgula, quebra de linha ou conectivos de contraste ("mas", "porém", "embora", "contudo")
       const fragmentosBrutos = obsBruta
         .split(/(?<=[.;!\n])\s+|\s+(?=(?:mas|por[eé]m|contudo|todavia|embora|no entanto)\b)/i)
         .map(f => f.trim())
@@ -700,7 +694,6 @@
         let limpo = frag.replace(/^[,\-•*]+\s*/, '').replace(/\.+$/, '').trim();
         if (!limpo) return;
 
-        // Caso híbrido na mesma frase: "Fez circuito motor, e a criança conseguiu..." ou "Trabalhado X, onde apresentou Y"
         const matchHibrido = limpo.match(/^(.+?)(?:,\s*(?:onde|no qual|na qual|e\s+(?:a crian[çc]a|ele|ela)\s+)|;\s*)(.+)$/i);
         if (matchHibrido && padraoEstrategia.test(matchHibrido[1]) && padraoResposta.test(matchHibrido[2])) {
           const estTech = higienizarETecnificarTexto(matchHibrido[1]);
@@ -718,10 +711,8 @@
         } else if (padraoResposta.test(limpo) && !padraoEstrategia.test(limpo)) {
           respostas.push(textoTecnico);
         } else if (padraoEstrategia.test(limpo)) {
-          // Se começa com verbo de intervenção ("foi feito circuito onde conseguiu..."), separa ou trata adequadamente
           estrategias.push(textoTecnico);
         } else {
-          // Por padrão, se descreve recurso/material curto sem verbo de desempenho, entra em estratégia; se tem ação/reação, entra em resposta
           if (textoTecnico.split(' ').length <= 6 && !/(conseguiu|precisou|necessitou|fez|realizou|aceitou|recusou|apresentou)/i.test(textoTecnico)) {
             estrategias.push(textoTecnico);
           } else {
@@ -735,17 +726,12 @@
 
     function formatarFragmentoEstrategia(est) {
       let s = est.trim();
-      // Remove verbos redundantes no começo para encaixar com "foram realizados..." ou "empregaram-se..."
       s = s.replace(/^(foi trabalhado|foram trabalhados|foram trabalhadas|foi trabalhada|trabalhamos|foi realizado|foram realizados|foram realizadas|foi realizada|foi feito|foram feitos|foram feitas|foi feita|utilizamos|foi utilizado|foram utilizados|foram utilizadas)\s+/i, '');
       return s.charAt(0).toLowerCase() + s.slice(1);
     }
 
-    function formatarFragmentoResposta(resp, primeiroNome) {
+    function formatarFragmentoResposta(resp) {
       let s = resp.trim();
-      // Se começar com "mas ", "porém ", "embora ", mantém o conectivo natural
-      if (/^(mas|por[eé]m|contudo|todavia|embora|no entanto)\b/i.test(s)) {
-        return s.charAt(0).toLowerCase() + s.slice(1);
-      }
       return s.charAt(0).toLowerCase() + s.slice(1);
     }
 
@@ -1022,7 +1008,6 @@
     function gerarTextoEvolucaoSessao(p, secoesAtivas, engajamento, assistencia, etapa, obsSala, condutaProx, formatoSessao) {
       const primeiroNome = p.nome.split(' ')[0];
 
-      // 1. OBJETIVO
       let objetivosTexto = '';
       if (secoesAtivas.length > 0) {
         const listaObj = formatarListaNatural(secoesAtivas.map(s => s.sec.objetivoCurto));
@@ -1031,7 +1016,6 @@
         objetivosTexto = 'Favorecer a organização sensório-motora, o planejamento motor (práxis) e o engajamento funcional nas ocupações infantis.';
       }
 
-      // 2. ESTRATÉGIA / PROCEDIMENTO (Incorpora checklists + estratégias extraídas das observações)
       let estrategiasTexto = '';
       const respostasDasObservacoes = [];
 
@@ -1044,7 +1028,7 @@
           const combinados = [...itensLower, ...estrategiasExtraidas];
 
           if (analiseObs.respostas.length > 0) {
-            respostasDasObservacoes.push(...analiseObs.respostas.map(r => formatarFragmentoResposta(r, primeiroNome)));
+            respostasDasObservacoes.push(...analiseObs.respostas.map(r => formatarFragmentoResposta(r)));
           }
 
           const recStr = combinados.length > 0 ? formatarListaNatural(combinados) : 'atividades terapêuticas estruturadas';
@@ -1055,7 +1039,6 @@
         estrategiasTexto = 'Realizadas atividades lúdicas estruturadas e experiências sensório-motoras graduadas para favorecer o planejamento motor e a autorregulação.';
       }
 
-      // 3. RESPOSTA OBSERVADA (Incorpora Engajamento + Assistência + Respostas das Observações + Obs Geral)
       const fraseEng = construirFraseEngajamento(engajamento);
       const fraseAss = construirFraseAssistencia(assistencia, etapa);
       let respostaTexto = `Durante o atendimento, ${primeiroNome} ${fraseEng} e ${fraseAss}.`;
@@ -1085,82 +1068,92 @@
     }
 
     // =========================================================================
-    // GERADOR 2A: RELATÓRIO RESUMIDO ENXUTO (PARÁGRAFO ÚNICO — INTELIGENTE)
+    // GERADOR 2A: RELATÓRIO RESUMIDO ULTRA-ENXUTO (MODELO BERNARDO — 1 PARÁGRAFO CURTO E DIRETO)
     // =========================================================================
     function gerarTextoRelatorioResumido(p, secoesAtivas, engajamento, assistencia, etapa, periodo, consistencia, obsSala, desafiosProx, relatoTerceiros) {
       const primeiroNome = p.nome.split(' ')[0];
-      const trechoPeriodo = periodo ? ` (período de ${periodo})` : '';
 
-      // 1. Objetivos
-      let objetivosLista = secoesAtivas.length > 0
+      // 1. Abertura + Objetivos (curto e direto, igual ao modelo do Bernardo)
+      const objetivosLista = secoesAtivas.length > 0
         ? formatarListaNatural(secoesAtivas.map(s => s.sec.objetivoCurto))
-        : 'ampliar a autonomia nas Atividades de Vida Diária (AVDs), promover a regulação sensorial, o planejamento motor e as habilidades sociais no brincar';
+        : 'promover a organização sensorial, o planejamento motor, a autonomia nas Atividades de Vida Diária (AVDs) e o engajamento funcional no brincar';
 
-      const fraseObjetivos = `O(A) paciente ${p.nome} encontra-se em acompanhamento de Terapia Ocupacional${trechoPeriodo} com o objetivo de estimular ${objetivosLista}.`;
+      const frase1 = `O paciente ${p.nome} encontra-se em acompanhamento de Terapia Ocupacional com o objetivo de estimular ${objetivosLista}.`;
 
-      // 2. Procedimentos e Estratégias (Checklists + Estratégias extraídas e tecnificadas das observações)
-      let todosRecursos = [];
-      let todasRespostasObs = [];
+      // 2. Recursos/Estratégias sintetizados (sem listar dezenas de subitens longos)
+      let recursosCurto = [];
+      let respostasObs = [];
 
       secoesAtivas.forEach(s => {
+        // Pega os itens principais de forma compacta (sem detalhes extensos entre parênteses)
         s.itens.forEach(item => {
-          todosRecursos.push(item.charAt(0).toLowerCase() + item.slice(1));
+          const itemSemParenteses = item.replace(/\s*\([^)]*\)/g, '').trim();
+          recursosCurto.push(itemSemParenteses.charAt(0).toLowerCase() + itemSemParenteses.slice(1));
         });
 
         const analiseObs = analisarObservacaoSecao(s.obs);
         analiseObs.estrategias.forEach(est => {
-          todosRecursos.push(formatarFragmentoEstrategia(est));
+          recursosCurto.push(formatarFragmentoEstrategia(est));
         });
         analiseObs.respostas.forEach(resp => {
-          todasRespostasObs.push(formatarFragmentoResposta(resp, primeiroNome));
+          respostasObs.push(formatarFragmentoResposta(resp));
         });
       });
 
-      const recursosFormatados = todosRecursos.length > 0
-        ? formatarListaNatural(todosRecursos)
-        : 'treinos funcionais de AVDs, circuitos motores graduados, experiências sensório-motoras e dinâmicas lúdicas com regras e turnos';
+      // Mantém no máximo 4 recursos principais para o texto ficar enxuto como o do Bernardo
+      const recursosSelecionados = recursosCurto.slice(0, 4);
+      const recursosTxt = recursosSelecionados.length > 0
+        ? formatarListaNatural(recursosSelecionados)
+        : 'atividades lúdicas estruturadas, experiências sensório-motoras, circuitos motores graduados e jogos com regras e turnos';
 
-      const fraseProcedimentos = `Para alcançar essas metas, foram realizados ${recursosFormatados}, com graduação das demandas e oferta de mediação terapêutica ajustada.`;
+      const frase2 = `Para alcançar essas metas, foram utilizados recursos como ${recursosTxt}.`;
 
-      // 3. Análise do Desempenho e Evolução (Engajamento + Assistência + Respostas das observações + Consistência)
-      const fraseEng = construirFraseEngajamento(engajamento);
-      const fraseAss = construirFraseAssistencia(assistencia, etapa);
-
-      const mapaConsistenciaCurto = {
-        'familiar_melhor': 'apresentando participação mais consistente em atividades estruturadas e familiares, embora ainda necessite de antecipação e mediação diante de propostas novas ou transições',
-        'generalizando': 'evidenciando aumento gradual na regularidade do desempenho e maior capacidade de iniciar, manter e concluir as atividades propostas',
-        'sensivel_ambiente': 'respondendo positivamente à organização do ambiente previsível e à divisão das tarefas em etapas graduadas'
+      // 3. Resultado / Desempenho observado (enxuto e clínico)
+      const mapaEngCurto = {
+        'bom': 'apresentou bom engajamento e participação espontânea',
+        'parcial': 'apresentou engajamento parcial mediante incentivo',
+        'recusa_inicial': 'apresentou cautela inicial com adesão gradual após acolhimento',
+        'oscilacao': 'apresentou oscilação no engajamento, respondendo aos redirecionamentos',
+        'baixa_iniciativa': 'apresentou baixa iniciativa espontânea, respondendo às mediações'
       };
 
-      let fraseDesempenho = `Como resultado observado ao longo do período, ${primeiroNome} ${fraseEng} e ${fraseAss}, ${mapaConsistenciaCurto[consistencia]}.`;
+      const mapaAssCurto = {
+        'independente': 'realizando as propostas de forma independente',
+        'supervisao': 'realizando as atividades sob supervisão',
+        'pista_verbal': 'necessitando de pistas verbais pontuais',
+        'pista_verbal_visual': 'necessitando de pistas verbais e visuais',
+        'modelagem': 'necessitando de demonstração e modelagem',
+        'apoio_fisico_parcial': 'necessitando de apoio físico parcial graduado',
+        'redirecionamento': 'necessitando de redirecionamento e mediação contínua'
+      };
 
-      if (todasRespostasObs.length > 0) {
-        const respUnidas = formatarListaNatural(todasRespostasObs);
-        fraseDesempenho += ` Nas atividades desenvolvidas, observou-se que ${respUnidas}.`;
-      }
+      let frase3 = `Como resultado observado ao longo do período, ${primeiroNome} ${mapaEngCurto[engajamento]}, ${mapaAssCurto[assistencia]}.`;
 
-      if (obsSala) {
+      if (respostasObs.length > 0) {
+        const respCompacta = formatarListaNatural(respostasObs.slice(0, 2));
+        frase3 += ` Durante as atividades, ${respCompacta}.`;
+      } else if (obsSala) {
         const obsTech = higienizarETecnificarTexto(obsSala);
         const obsClean = obsTech.charAt(0).toLowerCase() + obsTech.slice(1);
-        fraseDesempenho += ` Destaca-se ainda que ${obsClean}.`;
+        frase3 += ` Destaca-se que ${obsClean}.`;
       }
 
       if (relatoTerceiros) {
         const relClean = relatoTerceiros.charAt(0).toLowerCase() + relatoTerceiros.slice(1).replace(/\.$/, '');
-        fraseDesempenho += ` Quanto à generalização, segundo relato da família/escola, ${relClean}.`;
+        frase3 += ` Conforme relato familiar/escolar, ${relClean}.`;
       }
 
-      // 4. Considerações e Continuidade
-      let fraseContinuidade = '';
+      // 4. Encerramento / Continuidade (exatamente no tom direto do Bernardo)
+      let frase4 = '';
       if (desafiosProx) {
         const desTech = higienizarETecnificarTexto(desafiosProx);
         const desClean = desTech.charAt(0).toLowerCase() + desTech.slice(1);
-        fraseContinuidade = `Diante dos avanços, indica-se a continuidade do acompanhamento em Terapia Ocupacional para ${desClean}, favorecendo a consolidação e a generalização das conquistas no cotidiano.`;
+        frase4 = `Diante dos avanços, indica-se a continuidade do acompanhamento em Terapia Ocupacional para ${desClean}.`;
       } else {
-        fraseContinuidade = `Diante dos avanços observados, indica-se a continuidade do acompanhamento em Terapia Ocupacional para fortalecer sua autonomia funcional, ampliar a flexibilidade diante de demandas novas e favorecer a generalização para os contextos familiar e escolar.`;
+        frase4 = `Diante dos avanços, indica-se a continuidade do acompanhamento em Terapia Ocupacional para fortalecer sua autonomia funcional e favorecer a generalização dessas conquistas no cotidiano.`;
       }
 
-      return `${fraseObjetivos} ${fraseProcedimentos} ${fraseDesempenho} ${fraseContinuidade}`;
+      return `${frase1} ${frase2} ${frase3} ${frase4}`;
     }
 
     // =========================================================================
@@ -1176,10 +1169,9 @@
         ? formatarListaNatural(todosRecursos)
         : 'intervenções terapêuticas estruturadas';
 
-      // Monta a frase de resposta específica daquela área ocupacional a partir do que o terapeuta escreveu
       let complementoDesempenhoArea = '';
       if (analiseObs.respostas.length > 0) {
-        const respArea = formatarListaNatural(analiseObs.respostas.map(r => formatarFragmentoResposta(r, primeiroNome)));
+        const respArea = formatarListaNatural(analiseObs.respostas.map(r => formatarFragmentoResposta(r)));
         complementoDesempenhoArea = ` Durante essas vivências, ${primeiroNome} ${respArea}.`;
       }
 
